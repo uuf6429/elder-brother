@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50500) {
+    fwrite(STDERR, 'PHP version 5.5 or later is required.' . PHP_EOL);
+    exit(1);
+}
+
+set_error_handler(function ($severity, $message, $file, $line) {
+    if ($severity & error_reporting()) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    }
+});
+
+$paths = array(
+    __DIR__ . '/../../autoload.php',
+    __DIR__ . '/vendor/autoload.php',
+);
+$loaded = false;
+
+foreach ($paths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $loaded = true;
+        break;
+    }
+}
+
+if (!$loaded) {
+    throw new \RuntimeException(
+        'Autoloader not found (tried: ' . implode(', ', $paths) . ').'
+    );
+}
+
+unset($loaded, $paths);
+
+use uuf6429\GitProjectControl\Console\Application;
+$app = new Application();
+$app->run();

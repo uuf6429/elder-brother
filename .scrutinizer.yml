@@ -1,0 +1,74 @@
+checks:
+    php:
+        fix_php_opening_tag: true
+        remove_php_closing_tag: true
+        one_class_per_file: true
+        side_effects_or_types: false
+        no_mixed_inline_html: false
+        require_braces_around_control_structures: true
+        php5_style_constructor: true
+        no_global_keyword: true
+        avoid_usage_of_logical_operators: true
+        psr2_class_declaration: true
+        no_underscore_prefix_in_properties: true
+        no_underscore_prefix_in_methods: true
+        blank_line_after_namespace_declaration: true
+        single_namespace_per_use: false
+        psr2_switch_declaration: true
+        psr2_control_structure_declaration: false
+        avoid_superglobals: true
+        security_vulnerabilities: true
+        no_exit: false
+        use_self_instead_of_fqcn: true
+        uppercase_constants: true
+        return_doc_comments: true
+        return_doc_comment_if_not_inferrable: true
+        remove_extra_empty_lines: true
+        properties_in_camelcaps: true
+        phpunit_assertions: true
+        parameters_in_camelcaps: true
+        parameter_doc_comments: true
+        param_doc_comment_if_not_inferrable: true
+        overriding_parameter: true
+        optional_parameters_at_the_end: true
+        no_goto: true
+        newline_at_end_of_file: true
+        function_in_camel_caps: true
+        fix_line_ending: true
+        encourage_single_quotes: true
+        classes_in_camel_caps: true
+        avoid_todo_comments: true
+        avoid_fixme_comments: true
+        duplication: false
+
+filter: {  }
+coding_style:
+    php:
+        spaces:
+            before_parentheses:
+                closure_definition: true
+            around_operators:
+                concatenation: true
+        braces:
+            classes_functions:
+                class: new-line
+                function: new-line
+            if:
+                opening: end-of-line
+            for:
+                opening: end-of-line
+            while:
+                opening: end-of-line
+            do_while:
+                opening: end-of-line
+            switch:
+                opening: end-of-line
+            try:
+                opening: end-of-line
+        upper_lower_casing:
+            keywords:
+                general: lower
+            constants:
+                true_false_null: lower
+
+build: true
