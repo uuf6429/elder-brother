@@ -28,7 +28,16 @@ class Run extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $actions = $this->getConfigActions($output);
+        if (extension_loaded('xdebug')) {
+            $output->writeln(
+                sprintf(
+                    '<bg=yellow;fg=black;>%s</>',
+                    'Xdebug is enabled; performance will likely be affected.'
+                )
+            );
+        }
+
+        $actions = $this->getSupportedActions($output);
 
         if (!empty($actions)) {
             // See https://github.com/symfony/symfony/pull/10356 for multiple bars
@@ -57,7 +66,34 @@ class Run extends Command
     /**
      * @return ActionInterface[]
      */
-    protected function getConfigActions(OutputInterface $output)
+    protected function getSupportedActions(OutputInterface $output)
+    {
+        return array_filter(
+            $this->getConfiguredActions($output),
+            function (ActionInterface $action) use ($output) {
+                try {
+                    $action->checkSupport();
+
+                    return true;
+                } catch (\Exception $ex) {
+                    $message = sprintf(
+                        '%s is not supported: %s.',
+                        $action->getName(),
+                        $ex->getMessage()
+                    );
+                    $this->getApplication()->renderException(
+                        new \RuntimeException($message, 0, $ex),
+                        $output
+                    );
+                }
+            }
+        );
+    }
+
+    /**
+     * @return ActionInterface[]
+     */
+    protected function getConfiguredActions(OutputInterface $output)
     {
         $config = [];
         $configPaths = [

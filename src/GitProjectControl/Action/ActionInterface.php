@@ -15,6 +15,13 @@ interface ActionInterface
     public function getName();
 
     /**
+     * Throws an exception when action is not supported (eg: missing lib etc).
+     *
+     * @throws \Exception
+     */
+    public function checkSupport();
+
+    /**
      * Execute action for the given parameters.
      *
      * @param InputInterface  $input

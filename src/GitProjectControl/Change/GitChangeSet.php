@@ -72,6 +72,7 @@ class GitChangeSet
     protected static function getFiltered($filter = null)
     {
         return new FileList(
+            __METHOD__ . '(' . $filter . ')',
             function () use ($filter) {
                 $output = [];
                 $filter = $filter ? ('--diff-filter=' . escapeshellarg($filter)) : '';

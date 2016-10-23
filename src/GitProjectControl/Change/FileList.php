@@ -5,7 +5,7 @@ namespace uuf6429\GitProjectControl\Change;
 class FileList
 {
     /** @var string */
-    protected $qpath;
+    protected $cacheKey;
 
     /** @var callable */
     protected $source;
@@ -14,12 +14,12 @@ class FileList
     protected static $cache;
 
     /**
-     * @param string   $qpath
+     * @param string   $cacheKey
      * @param callable $source
      */
-    public function __construct($qpath, callable $source)
+    public function __construct($cacheKey, callable $source)
     {
-        $this->qpath = $qpath;
+        $this->cacheKey = $cacheKey;
         $this->source = $source;
     }
 
@@ -28,14 +28,14 @@ class FileList
      *
      * @param string $string
      *
-     * @return \self
+     * @return static
      */
     public function startingWith($string)
     {
         $source = $this->source;
 
         return new self(
-            $this->qpath . '->' . __FUNCTION__ . '(' . $string . ')',
+            $this->cacheKey . '->' . __FUNCTION__ . '(' . $string . ')',
             function () use ($source, $string) {
                 return array_filter(
                     function ($file) use ($string) {
@@ -56,14 +56,14 @@ class FileList
      *
      * @param string $string
      *
-     * @return \self
+     * @return static
      */
     public function endingWith($string)
     {
         $source = $this->source;
 
         return new self(
-            $this->qpath . '->' . __FUNCTION__ . '(' . $string . ')',
+            $this->cacheKey . '->' . __FUNCTION__ . '(' . $string . ')',
             function () use ($source, $string) {
                 return array_filter(
                     function ($file) use ($string) {
@@ -86,11 +86,11 @@ class FileList
      */
     public function toArray()
     {
-        if (!isset(self::$cache[$this->qpath])) {
+        if (!isset(self::$cache[$this->cacheKey])) {
             $source = $this->source;
-            self::$cache[$this->qpath] = $source();
+            self::$cache[$this->cacheKey] = $source();
         }
 
-        return self::$cache[$this->qpath];
+        return self::$cache[$this->cacheKey];
     }
 }

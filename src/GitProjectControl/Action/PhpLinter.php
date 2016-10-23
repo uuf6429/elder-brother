@@ -34,11 +34,33 @@ class PhpLinter implements ActionInterface
     /**
      * {@inheritdoc}
      */
+    public function checkSupport()
+    {
+        $output = $exitCode = null;
+        exec('php -v', $output, $exitCode);
+
+        if ($exitCode !== 0) {
+            throw new \RuntimeException(
+                sprintf(
+                    'PHP could not be executed successfully (exit code: %d): %s',
+                    $exitCode,
+                    (count($output) > 1 ? PHP_EOL : '') . implode(PHP_EOL, $output)
+                )
+            );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $files = $this->files->toArray();
+
         $progress = new ProgressBar($output, count($files));
         $progress->start();
+
+        $failed = [];
 
         foreach ($files as $file) {
             $progress->setMessage('Processing ' . $file . '...');
@@ -48,17 +70,25 @@ class PhpLinter implements ActionInterface
             exec('php -l ' . escapeshellarg($file), $outp, $exit);
 
             if ($exit) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'PhpLinter failed for %s:\n- %s\nExit Code: %s',
-                        $file,
-                        implode('\n- ', $outp),
-                        $exit
-                    )
+                $failed[$file] = array_filter(
+                    $outp,
+                    function ($line) {
+                        return strlen($line)
+                            && substr($line, 0, 15) !== 'Errors parsing ';
+                    }
                 );
             }
 
             $progress->advance();
+        }
+
+        if (count($failed)) {
+            $message = 'PhpLinter failed for the following file(s):';
+            foreach ($failed as $file => $output) {
+                $message .= PHP_EOL . '- <options=underline>' . $file . '</>:';
+                $message .= PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $output);
+            }
+            throw new \RuntimeException($message);
         }
 
         $progress->finish();
