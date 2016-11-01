@@ -1,25 +1,25 @@
-# Git Project Control
+# Elder Brother
 
-[![Build Status](https://travis-ci.org/uuf6429/git-project-control.svg?branch=master)](https://travis-ci.org/uuf6429/git-project-control)
+[![Build Status](https://travis-ci.org/uuf6429/elder-brother.svg?branch=master)](https://travis-ci.org/uuf6429/elder-brother)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%205.5-8892BF.svg)](https://php.net/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/uuf6429/git-project-control/master/LICENSE)
-[![Coverage](https://codecov.io/gh/uuf6429/git-project-control/branch/master/graph/badge.svg?token=Bu2nK2Kq77)](https://codecov.io/github/uuf6429/git-project-control?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/uuf6429/git-project-control/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/uuf6429/git-project-control/?branch=master)
-[![Packagist](https://img.shields.io/packagist/v/uuf6429/GitProjectControl.svg)](https://packagist.org/packages/uuf6429/GitProjectControl)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/uuf6429/elder-brother/master/LICENSE)
+[![Coverage](https://codecov.io/gh/uuf6429/elder-brother/branch/master/graph/badge.svg?token=Bu2nK2Kq77)](https://codecov.io/github/uuf6429/elder-brother?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/uuf6429/elder-brother/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/uuf6429/elder-brother/?branch=master)
+[![Packagist](https://img.shields.io/packagist/v/uuf6429/ElderBrother.svg)](https://packagist.org/packages/uuf6429/ElderBrother)
 
-Set up and manage contribution policies for your PHP-based projects.
+Elder Brother automatically regulates contributions before reaching your project.
 
-Using the power of [Git-hooks](http://githooks.com/), one can ease development in various ways, such as:
+Using events such as [Git-hooks](http://githooks.com/), one can ease development in various ways, such as:
 - ensure code style conformity before committing changes
 - run tools whose output should be a part of the commit
 - performing roll-backs when checking-out old commits
-- generating css out of scss/sass or performing migrations when checking-out newer commits
+- compiling sources or performing migrations when checking-out newer commits
 
 This tools makes it easy to set up these tasks, as well as putting such policies under version control.
 
 ## Table Of Contents
 
-- [Git Project Control](#git-project-control)
+- [Elder Brother](#elder-brother)
   - [Table Of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -30,7 +30,7 @@ This tools makes it easy to set up these tasks, as well as putting such policies
 Ideally, this should be installed with [Composer](https://getcomposer.org/):
 
 ```bash
-composer require uuf6429/git-project-control "~1.0"
+composer require uuf6429/elder-brother "~1.0"
 ```
 
 ## Usage

@@ -1,7 +1,7 @@
 {
-    "name": "uuf6429/git-project-control",
+    "name": "uuf6429/elder-brother",
     "description": "Set up and manage contribution policies for your PHP-based projects.",
-    "homepage": "https://github.com/uuf6429/git-project-control",
+    "homepage": "https://github.com/uuf6429/elder-brother",
     "type": "application",
     "license": "MIT",
     "authors": [
@@ -11,7 +11,7 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/uuf6429/git-project-control/issues"
+        "issues": "https://github.com/uuf6429/elder-brother/issues"
     },
     "require": {
         "php": "^5.5.0 || ^7.0",
@@ -23,16 +23,16 @@
     },
     "autoload": {
         "psr-4": {
-            "uuf6429\\GitProjectControl\\": "src/GitProjectControl"
+            "uuf6429\\ElderBrother\\": "src/ElderBrother"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "uuf6429\\GitProjectControl\\": "test/GitProjectControl"
+            "uuf6429\\ElderBrother\\": "test/ElderBrother"
         }
     },
     "suggest": {
         "friendsofphp/php-cs-fixer": "Needed for PhpCsFixerAction"
     },
-    "bin": ["git-project-control"]
+    "bin": ["elder-brother"]
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace uuf6429\GitProjectControl\Console\Command;
+namespace uuf6429\ElderBrother\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

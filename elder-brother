@@ -13,8 +13,8 @@ set_error_handler(function ($severity, $message, $file, $line) {
 });
 
 $paths = array(
-    __DIR__ . '/../../autoload.php',
-    __DIR__ . '/vendor/autoload.php',
+    __DIR__ . '/../../autoload.php',    // when run as a package
+    __DIR__ . '/vendor/autoload.php',   // when run as a project
 );
 $loaded = false;
 
@@ -34,6 +34,8 @@ if (!$loaded) {
 
 unset($loaded, $paths);
 
-use uuf6429\GitProjectControl\Console\Application;
+define('PROJECT_ROOT', getcwd() . DIRECTORY_SEPARATOR);
+
+use uuf6429\ElderBrother\Console\Application;
 $app = new Application();
 $app->run();

@@ -1,12 +1,12 @@
 <?php
 
-namespace uuf6429\GitProjectControl\Console\Command;
+namespace uuf6429\ElderBrother\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use uuf6429\GitProjectControl\Action\ActionInterface;
+use uuf6429\ElderBrother\Action\ActionInterface;
 
 class Run extends Command
 {
@@ -28,6 +28,10 @@ class Run extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if($output->isDebug()){
+            $output->writeln('<info>Running from:</info> ' . PROJECT_ROOT);
+        }
+        
         if (extension_loaded('xdebug')) {
             $output->writeln(
                 sprintf(

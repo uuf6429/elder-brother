@@ -1,8 +1,8 @@
 <?php
 
-namespace uuf6429\GitProjectControl\Action;
+namespace uuf6429\ElderBrother\Action;
 
-use uuf6429\GitProjectControl\Change;
+use uuf6429\ElderBrother\Change;
 
 class PhpLinterTest extends \PHPUnit_Framework_TestCase
 {

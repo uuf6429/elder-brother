@@ -1,6 +1,6 @@
 <?php
 
-namespace uuf6429\GitProjectControl\Change;
+namespace uuf6429\ElderBrother\Change;
 
 class FileList
 {

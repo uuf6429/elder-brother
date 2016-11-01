@@ -1,11 +1,11 @@
 <?php
 
-namespace uuf6429\GitProjectControl\Action;
+namespace uuf6429\ElderBrother\Action;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use uuf6429\GitProjectControl\Change\FileList;
+use uuf6429\ElderBrother\Change\FileList;
 
 class PhpLinter implements ActionInterface
 {

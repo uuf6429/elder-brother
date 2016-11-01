@@ -1,7 +1,7 @@
 <?php
 
-use uuf6429\GitProjectControl\Action;
-use uuf6429\GitProjectControl\Change\GitChangeSet;
+use uuf6429\ElderBrother\Action;
+use uuf6429\ElderBrother\Change\GitChangeSet;
 
 return [
     10 => new Action\PhpLinter(
