@@ -27,22 +27,30 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
             );
             $action = new PhpLinter($fileList);
 
-            if ($expectedException) {
-                $expectedMessage = str_replace(
-                    array_keys($fileContents),
+            try {
+                $action->execute($this->getInputMock(), $this->getOutputMock());
+
+                $this->assertNull($expectedException, 'No exception should be thrown.');
+            } catch (\Exception $ex) {
+                if (!$expectedException) {
+                    throw $ex;
+                }
+
+                // replace virtual filenames with fake filenames
+                $message = str_replace(
                     $createdFiles,
-                    $expectedException->getMessage()
+                    array_keys($fileContents),
+                    $ex->getMessage()
                 );
 
-                $this->setExpectedException(
-                    get_class($expectedException),
-                    $expectedMessage
-                );
+                // replace platform-specific text with general text
+                $aliases = ['Parse error:', 'Fatal error: Uncaught Error:', 'Fatal error:'];
+                $message = str_replace($aliases, '????:', $message);
+
+                // do some asserting :)
+                $this->assertSame(get_class($expectedException), get_class($ex));
+                $this->assertSame($expectedException->getMessage(), $message);
             }
-
-            $action->execute($this->getInputMock(), $this->getOutputMock());
-
-            $this->assertNull($expectedException, 'No exception should be thrown.');
 
             $this->removeFiles($createdFiles);
         } catch (\Exception $ex) {
@@ -74,14 +82,13 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                 '$expectedException' => new \RuntimeException(
                     'PhpLinter failed for the following file(s):' . PHP_EOL .
                     '- <options=underline>file2.php</>:' . PHP_EOL .
-                    ' - Parse error: syntax error, unexpected \'"\', expecting \',\' or \';\' in file2.php on line 1'
+                    ' - ????: syntax error, unexpected \'"\', expecting \',\' or \';\' in file2.php on line 1'
                 ),
             ],
             'files with some errors' => [
                 '$fileContents' => [
                     'file3.php' => '<?php echo Test1"; ',
                     'file4.php' => '<?php echo "Test1"; ',
-                    'file5.php' => '<?php ecsho "Test1"; ',
                     'file6.php' => '',
                     'file7.php' => '<?php return 0; ',
                     'file8.php' => '<?php dgsda!^hfd ',
@@ -89,11 +96,9 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                 '$expectedException' => new \RuntimeException(
                     'PhpLinter failed for the following file(s):' . PHP_EOL .
                     '- <options=underline>file3.php</>:' . PHP_EOL .
-                    ' - Parse error: syntax error, unexpected \'"\', expecting \',\' or \';\' in file3.php on line 1' . PHP_EOL .
-                    '- <options=underline>file5.php</>:' . PHP_EOL .
-                    ' - Parse error: syntax error, unexpected \'"Test1"\' (T_CONSTANT_ENCAPSED_STRING) in file5.php on line 1' . PHP_EOL .
+                    ' - ????: syntax error, unexpected \'"\', expecting \',\' or \';\' in file3.php on line 1' . PHP_EOL .
                     '- <options=underline>file8.php</>:' . PHP_EOL .
-                    ' - Parse error: syntax error, unexpected \'!\' in file8.php on line 1'
+                    ' - ????: syntax error, unexpected \'!\' in file8.php on line 1'
                 ),
             ],
         ];
