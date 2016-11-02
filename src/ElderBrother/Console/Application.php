@@ -3,17 +3,59 @@
 namespace uuf6429\ElderBrother\Console;
 
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use uuf6429\ElderBrother\Config;
 
 class Application extends ConsoleApplication
 {
+    /**
+     * @var ConsoleOutput
+     */
+    private $output;
+    /**
+     * @var ConsoleLogger
+     */
+    private $logger;
+    /**
+     * @var Config
+     */
+    private $config;
+
     public function __construct()
     {
         error_reporting(-1);
 
         parent::__construct('Elder Brother', '1.0.0');
 
-        $this->add(new Command\Run());
-        $this->add(new Command\GitInstall());
+        $this->output = new ConsoleOutput();
+        $this->logger = new ConsoleLogger($this->output);
+        $this->config = new Config(
+            [
+                'project config' => 'path1', // TODO fix path
+                'user config' => 'path1', // TODO fix path
+            ],
+            $this->logger
+        );
+
+        $this->add(new Command\Run($this->config));
+        //$this->add(new Command\GitInstall());
         //$this->add(new Command\GitUninstall());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \RuntimeException
+     */
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
+        if ($output) {
+            throw new \RuntimeException('Output cannot be set.');
+        }
+
+        return parent::run($input, $this->output);
     }
 }

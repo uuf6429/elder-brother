@@ -21,17 +21,17 @@ class Git
     const PRE_AUTO_GC = 'git:pre-auto-gc';
     const POST_REWRITE = 'git:post-rewrite';
     const PRE_PUSH = 'git:pre-push';
-    
+
     /**
      * Returns list of git hook filenames.
-     * 
+     *
      * @return string[]
      */
     public static function getHookFiles()
     {
         static $hooks = null;
-        
-        if(!$hooks){
+
+        if (!$hooks) {
             $hooks = array_map(
                 function ($eventName) {
                     return '.git/hooks/' . substr($eventName, 4);
@@ -40,7 +40,7 @@ class Git
                     ->getConstants()
             );
         }
-        
+
         return $hooks;
     }
 }

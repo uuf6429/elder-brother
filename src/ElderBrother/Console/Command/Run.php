@@ -6,11 +6,26 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use uuf6429\ElderBrother\Action\ActionInterface;
+use uuf6429\ElderBrother\Config;
 use uuf6429\ElderBrother\Exception\RecoverableException;
 
 class Run extends Command
 {
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * @param Config $config
+     */
+    public function __construct(Config $config)
+    {
+        parent::__construct(null);
+
+        $this->config = $config;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -29,10 +44,10 @@ class Run extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if($output->isDebug()){
+        if ($output->isDebug()) {
             $output->writeln('<info>Running from:</info> ' . PROJECT_ROOT);
         }
-        
+
         if (extension_loaded('xdebug')) {
             $output->writeln(
                 sprintf(
@@ -42,7 +57,9 @@ class Run extends Command
             );
         }
 
-        $actions = $this->getSupportedActions($output);
+        $event = ''; // TODO get from param
+
+        $actions = $this->config->get($event);
 
         if (!empty($actions)) {
             // See https://github.com/symfony/symfony/pull/10356 for multiple bars
@@ -58,7 +75,7 @@ class Run extends Command
 
                 try {
                     $action->execute($input, $output);
-                } catch(RecoverableException $ex) {
+                } catch (RecoverableException $ex) {
                     $this->getApplication()->renderException($ex, $output); // TODO customize this for recoverable exceptions
                 }
             }
@@ -68,60 +85,5 @@ class Run extends Command
         } else {
             $output->writeln('<info>No actions have been set up yet!</info>');
         }
-
-        exit(0);
-    }
-
-    /**
-     * @return ActionInterface[]
-     */
-    protected function getSupportedActions(OutputInterface $output)
-    {
-        return array_filter(
-            $this->getConfiguredActions($output),
-            function (ActionInterface $action) use ($output) {
-                try {
-                    $action->checkSupport();
-
-                    return true;
-                } catch (\Exception $ex) {
-                    $message = sprintf(
-                        '%s is not supported: %s.',
-                        $action->getName(),
-                        $ex->getMessage()
-                    );
-                    $this->getApplication()->renderException(
-                        new \RuntimeException($message, 0, $ex),
-                        $output
-                    );
-                }
-            }
-        );
-    }
-
-    /**
-     * @return ActionInterface[]
-     */
-    protected function getConfiguredActions(OutputInterface $output)
-    {
-        $config = [];
-        $configPaths = [
-            'project config' => 'path1', // TODO fix path
-            'user config' => 'path1', // TODO fix path
-        ];
-
-        foreach ($configPaths as $configType => $configPath) {
-            if (file_exists($configPath)) {
-                if ($output->isVerbose()) {
-                    $output->writeln("<info>Reading $configType from $configPath...</info>");
-                }
-
-                $config = array_merge($config, include($configPath)); // TODO to be fixed in #1 or #3
-            } elseif ($output->isVerbose()) {
-                $output->writeln("<info>Reading $configType from $configPath skipped (no file).</info>");
-            }
-        }
-
-        return $config;
     }
 }

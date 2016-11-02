@@ -2,10 +2,10 @@
 
 namespace uuf6429\ElderBrother\Action;
 
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Change\FileList;
-use RuntimeException;
 
 class ForbiddenFiles implements ActionInterface
 {

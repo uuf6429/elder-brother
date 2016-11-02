@@ -2,8 +2,8 @@
 
 namespace uuf6429\ElderBrother\Action;
 
+use RuntimeException;
 use uuf6429\ElderBrother\Change;
-use \RuntimeException;
 
 class ForbiddenFilesTest extends \PHPUnit_Framework_TestCase
 {
