@@ -7,6 +7,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Action\ActionInterface;
+use uuf6429\ElderBrother\Exception\RecoverableException;
 
 class Run extends Command
 {
@@ -55,7 +56,11 @@ class Run extends Command
                 $progress->advance();
                 $output->write("\n");
 
-                $action->execute($input, $output);
+                try {
+                    $action->execute($input, $output);
+                } catch(RecoverableException $ex) {
+                    $this->getApplication()->renderException($ex, $output); // TODO customize this for recoverable exceptions
+                }
             }
 
             $progress->finish();

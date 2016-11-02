@@ -12,7 +12,7 @@ return [
             GitChangeSet::getAddedCopiedModified()
                 ->name('/.php$/')
         ),
-    30 => new Action\FileValidator(
+    30 => new Action\ForbiddenFiles(
             GitChangeSet::getAdded()
                 ->name('/^tools\\(migrations|rollbacks)\\/')
                 ->notName('/GPC-\d+-\d{2}-\d{2}-\d{4}[a-z]?\.(sql|php)$/'),

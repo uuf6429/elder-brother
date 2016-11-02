@@ -3,8 +3,9 @@
 namespace uuf6429\ElderBrother\Action;
 
 use uuf6429\ElderBrother\Change;
+use \RuntimeException;
 
-class FileValidatorTest extends \PHPUnit_Framework_TestCase
+class ForbiddenFilesTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param string[]        $files
@@ -21,7 +22,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 return $files;
             }
         );
-        $action = new FileValidator($fileList, $reason);
+        $action = new ForbiddenFiles($fileList, $reason);
 
         if ($expectedException) {
             $this->setExpectedException(
@@ -49,8 +50,8 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'fail validation for one file' => [
                 '$files' => ['A:\\file\\that\\failed.txt'],
                 '$reason' => 'Files from floppy disks are not allowed!',
-                '$expectedException' => new \RuntimeException(
-                    'The following files failed validation:' . PHP_EOL .
+                '$expectedException' => new RuntimeException(
+                    'The following files are not allowed:' . PHP_EOL .
                     '- A:\file\that\failed.txt' . PHP_EOL .
                     'Files from floppy disks are not allowed!'
                 ),
@@ -58,8 +59,8 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'fail validation for some files, without reason' => [
                 '$files' => ['test/file1.txt', 'test/file2.txt'],
                 '$reason' => '',
-                '$expectedException' => new \RuntimeException(
-                    'The following files failed validation:' . PHP_EOL .
+                '$expectedException' => new RuntimeException(
+                    'The following files are not allowed:' . PHP_EOL .
                     '- test/file1.txt' . PHP_EOL .
                     '- test/file2.txt'
                 ),

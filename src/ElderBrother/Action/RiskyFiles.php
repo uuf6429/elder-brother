@@ -5,8 +5,9 @@ namespace uuf6429\ElderBrother\Action;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Change\FileList;
+use uuf6429\ElderBrother\Exception\RecoverableException;
 
-class FileValidator implements ActionInterface
+class RiskyFiles implements ActionInterface
 {
     /**
      * @var FileList
@@ -17,7 +18,7 @@ class FileValidator implements ActionInterface
     protected $reason;
 
     /**
-     * Will stop process if $files is not empty, for the reason specified in $reason.
+     * Will show a warning if $files is not empty, for the reason specified in $reason.
      *
      * @param FileList $files
      * @param string   $reason
@@ -30,7 +31,7 @@ class FileValidator implements ActionInterface
 
     public function getName()
     {
-        return 'Simple file validation (FileValidator)';
+        return 'Show warning for files (RiskyFiles)';
     }
 
     public function checkSupport()
@@ -44,9 +45,9 @@ class FileValidator implements ActionInterface
 
         if (count($files)) {
             $bull = PHP_EOL . '- ';
-            throw new \RuntimeException(
+            throw new RecoverableException(
                 sprintf(
-                    'The following files failed validation:%s',
+                    'The following files are a potential risk:%s',
                     rtrim($bull . implode($bull, $files) . PHP_EOL . $this->reason)
                 )
             );
