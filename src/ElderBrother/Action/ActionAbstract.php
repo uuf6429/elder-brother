@@ -46,7 +46,8 @@ abstract class ActionAbstract
 
         $progress = new ProgressBar($output, $steps);
         $progress->setFormat(' %current%/%max% [%bar%] %percent:3s%% %memory:6s% %message%');
-        //$progress->setRedrawFrequency(1);
+        $progress->setRedrawFrequency(1);
+
         return $progress;
     }
 }

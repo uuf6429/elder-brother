@@ -61,19 +61,20 @@ class Run extends Command
         }
 
         $event = $input->getOption('event');
-        $withProgress = !$input->hasOption('no-progress');
         $actions = $this->config->get($event);
 
         if (!empty($actions)) {
-            if ($withProgress) {
-                // See https://github.com/symfony/symfony/pull/10356 for multiple bars
-                $progress = new ProgressBar($output, count($actions));
+            // See https://github.com/symfony/symfony/pull/10356 for multiple bars
+            $progress = $input->hasOption('no-progress')
+                ? new ProgressBar($output, count($actions))
+                : null;
+            if ($progress) {
                 $progress->start();
                 $output->write("\n");
             }
 
             foreach ($actions as $action) {
-                if ($withProgress) {
+                if ($progress) {
                     $output->write("\033[1A");
                     $progress->setMessage('Running "' . $action->getName() . '".');
                     $progress->advance();
@@ -92,7 +93,7 @@ class Run extends Command
                 }
             }
 
-            if ($withProgress) {
+            if ($progress) {
                 $progress->finish();
             }
             $output->writeln('Done.');

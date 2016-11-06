@@ -2,7 +2,7 @@
 
 namespace uuf6429\ElderBrother;
 
-class GitTest extends BaseProjectTest
+class GitProjectTest extends BaseProjectTest
 {
     public function setUp()
     {

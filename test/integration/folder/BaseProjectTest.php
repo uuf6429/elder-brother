@@ -5,7 +5,7 @@ namespace uuf6429\ElderBrother;
 abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var sting Temporary directory for project under test
+     * @var string Temporary directory for project under test
      */
     protected static $projectPath;
 
@@ -31,7 +31,7 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
         chdir(self::$projectPath);
     }
 
-    public static function tearDownAfterClass2222222222()
+    public static function tearDownAfterClass()
     {
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(

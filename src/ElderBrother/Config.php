@@ -75,7 +75,7 @@ class Config
             $this->load();
         }
 
-        return $this->config;
+        return (array) $this->config;
     }
 
     /**

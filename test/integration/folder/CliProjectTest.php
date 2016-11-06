@@ -2,7 +2,7 @@
 
 namespace uuf6429\ElderBrother;
 
-class NoVcsTest extends BaseProjectTest
+class CliProjectTest extends BaseProjectTest
 {
     const CUSTOM_EVENT = 'custom:test';
 
