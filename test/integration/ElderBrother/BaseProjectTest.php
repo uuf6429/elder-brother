@@ -24,6 +24,9 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
         parent::setUpBeforeClass();
 
         self::$projectLockFile = tempnam(sys_get_temp_dir(), 'test');
+
+        self::assertNotEmpty(self::$projectLockFile);
+
         self::$projectPath = self::$projectLockFile . '_dir';
         mkdir(self::$projectPath);
 

@@ -65,7 +65,7 @@ class GitChangeSet
     }
 
     /**
-     * @param string $filter See https://git-scm.com/docs/git-diff (--diff-filter)
+     * @param string|null $filter See https://git-scm.com/docs/git-diff (--diff-filter)
      *
      * @return FileList
      */
@@ -73,10 +73,14 @@ class GitChangeSet
     {
         return new FileList(
             __METHOD__ . '(' . $filter . ')',
-            function () use ($filter) {
+            function () use (&$filter) {
                 $output = [];
-                $filter = $filter ? ('--diff-filter=' . escapeshellarg($filter)) : '';
-                exec("git diff --cached --name-status $filter", $output);
+                $command = 'git diff --cached --name-status';
+                if ($filter) {
+                    $command .= ' --diff-filter=' . escapeshellarg($filter);
+                }
+
+                exec($command, $output);
 
                 return array_unique(
                     array_map(
