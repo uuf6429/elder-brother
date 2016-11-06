@@ -61,7 +61,7 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
      * Runs a command and compares result against expection.
      *
      * @param string        $command        The command to execute
-     * @param mixed         $expectedResult Expected exit code
+     * @param int           $expectedResult Expected exit code
      * @param string[]|null $expectedOutput Expected stdout as array of lines (null to skip check)
      * @param string        $message        Description of the assertion
      */
@@ -83,9 +83,7 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
             );
         }
 
-        if (!is_null($expectedResult)) {
-            static::assertEquals($expectedResult, $actualResult, $message);
-        }
+        static::assertEquals($expectedResult, $actualResult, $message);
 
         if (!is_null($expectedOutput)) {
             static::assertEquals($expectedOutput, $actualOutput, $message);

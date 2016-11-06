@@ -41,8 +41,8 @@ class Application extends ConsoleApplication
         );
 
         $this->add(new Command\Run($this->config));
-        //$this->add(new Command\GitInstall());
-        //$this->add(new Command\GitUninstall());
+        $this->add(new Command\Install());
+        $this->add(new Command\Uninstall());
     }
 
     /**

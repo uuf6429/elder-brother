@@ -24,8 +24,8 @@ class Config
     protected $config;
 
     /**
-     * @param string[]        $paths
-     * @param LoggerInterface $logger
+     * @param string[]             $paths
+     * @param LoggerInterface|null $logger
      */
     public function __construct($paths, LoggerInterface $logger = null)
     {

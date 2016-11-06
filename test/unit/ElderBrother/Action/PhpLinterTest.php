@@ -123,14 +123,14 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $fileContents
+     * @param array<string, string> $fileContents
      */
     protected function createFiles($fileContents)
     {
         return array_values(
             array_map(
                 function ($index, $content) {
-                    $filename = tempnam(sys_get_temp_dir(), "tf$index");
+                    $filename = tempnam(sys_get_temp_dir(), $index);
                     file_put_contents($filename, $content);
 
                     return $filename;
@@ -147,7 +147,7 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
     protected function removeFiles($files)
     {
         foreach ($files as $file) {
-            @unlink($file);
+            unlink($file);
         }
     }
 }

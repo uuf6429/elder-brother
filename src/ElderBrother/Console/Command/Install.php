@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GitUninstall extends Command
+class Install extends Command
 {
     /**
      * {@inheritdoc}
@@ -14,9 +14,9 @@ class GitUninstall extends Command
     protected function configure()
     {
         $this
-            ->setName('git-uninstall')
-            ->setDescription('Uninstalls git hooks.')
-            ->setHelp('This command removes all hooks to this system and restores original ones.')
+            ->setName('git-install')
+            ->setDescription('Installs git hooks.')
+            ->setHelp('This command set up this system for use with a git repository.')
         ;
     }
 
@@ -25,6 +25,6 @@ class GitUninstall extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO
+        throw new \RuntimeException('Not implemented yet.');
     }
 }
