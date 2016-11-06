@@ -34,8 +34,8 @@ class Application extends ConsoleApplication
         $this->logger = new ConsoleLogger($this->output);
         $this->config = new Config(
             [
-                'project config' => 'path1', // TODO fix path
-                'user config' => 'path1', // TODO fix path
+                'project config' => PROJECT_ROOT . '.brother.php',
+                'user config' => PROJECT_ROOT . '.brother.local.php',
             ],
             $this->logger
         );

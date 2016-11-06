@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Change\FileList;
 
-class ForbiddenFiles implements ActionInterface
+class ForbiddenFiles extends ActionAbstract
 {
     /**
      * @var FileList

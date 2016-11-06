@@ -81,7 +81,7 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                 ],
                 '$expectedException' => new \RuntimeException(
                     'PhpLinter failed for the following file(s):' . PHP_EOL .
-                    '- <options=underline>file2.php</>:' . PHP_EOL .
+                    '- file2.php:' . PHP_EOL .
                     ' - ????: syntax error, unexpected \'"\', expecting \',\' or \';\' in file2.php on line 1'
                 ),
             ],
@@ -95,9 +95,9 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                 ],
                 '$expectedException' => new \RuntimeException(
                     'PhpLinter failed for the following file(s):' . PHP_EOL .
-                    '- <options=underline>file3.php</>:' . PHP_EOL .
+                    '- file3.php:' . PHP_EOL .
                     ' - ????: syntax error, unexpected \'"\', expecting \',\' or \';\' in file3.php on line 1' . PHP_EOL .
-                    '- <options=underline>file8.php</>:' . PHP_EOL .
+                    '- file8.php:' . PHP_EOL .
                     ' - ????: syntax error, unexpected \'!\' in file8.php on line 1'
                 ),
             ],

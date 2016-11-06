@@ -4,6 +4,7 @@ namespace uuf6429\ElderBrother;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use uuf6429\ElderBrother\Action\ActionAbstract;
 
 class Config
 {
@@ -35,7 +36,7 @@ class Config
     /**
      * @return self
      */
-    public function load()
+    protected function load()
     {
         $this->config = [];
 
@@ -70,6 +71,10 @@ class Config
      */
     public function getAll()
     {
+        if (is_null($this->config)) {
+            $this->load();
+        }
+
         return $this->config;
     }
 
@@ -77,17 +82,21 @@ class Config
      * @param string $event
      * @param bool   $supportedOnly
      *
-     * @return ActionInterface[]
+     * @return ActionAbstract[]
      */
     public function get($event, $supportedOnly = true)
     {
+        if (is_null($this->config)) {
+            $this->load();
+        }
+
         $config = isset($this->config[$event])
             ? array_values($this->config[$event]) : [];
 
         if ($supportedOnly) {
             $config = array_filter(
                 $config,
-                function (ActionInterface $action) {
+                function (ActionAbstract $action) {
                     try {
                         $action->checkSupport();
 

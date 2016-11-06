@@ -38,4 +38,5 @@ define('PROJECT_ROOT', getcwd() . DIRECTORY_SEPARATOR);
 
 use uuf6429\ElderBrother\Console\Application;
 $app = new Application();
+$app->setAutoExit(true);
 $app->run();

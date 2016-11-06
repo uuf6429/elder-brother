@@ -2,12 +2,11 @@
 
 namespace uuf6429\ElderBrother\Action;
 
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Change\FileList;
 
-class PhpLinter implements ActionInterface
+class PhpLinter extends ActionAbstract
 {
     /** @var FileList */
     protected $files;
@@ -57,7 +56,7 @@ class PhpLinter implements ActionInterface
     {
         $files = $this->files->toArray();
 
-        $progress = new ProgressBar($output, count($files));
+        $progress = $this->createProgressBar($input, $output, count($files));
         $progress->start();
 
         $failed = [];
@@ -84,9 +83,9 @@ class PhpLinter implements ActionInterface
 
         if (count($failed)) {
             $message = 'PhpLinter failed for the following file(s):';
-            foreach ($failed as $file => $output) {
-                $message .= PHP_EOL . '- <options=underline>' . $file . '</>:';
-                $message .= PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $output);
+            foreach ($failed as $file => $result) {
+                $message .= PHP_EOL . '- ' . $file . ':';
+                $message .= PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $result);
             }
             throw new \RuntimeException($message);
         }

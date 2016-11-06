@@ -7,7 +7,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Change\FileList;
 use uuf6429\ElderBrother\Exception\RecoverableException;
 
-class RiskyFiles implements ActionInterface
+class RiskyFiles extends ActionAbstract
 {
     /**
      * @var FileList

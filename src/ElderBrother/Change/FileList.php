@@ -24,6 +24,30 @@ class FileList
     }
 
     /**
+     * Filter by file path matching a regular expression.
+     *
+     * @param string $regex
+     *
+     * @return static
+     */
+    public function name($regex)
+    {
+        $source = $this->source;
+
+        return new self(
+            $this->cacheKey . '->' . __FUNCTION__ . '(' . $regex . ')',
+            function () use ($source, $regex) {
+                return array_filter(
+                    $source(),
+                    function ($file) use ($regex) {
+                        return preg_match($regex, $file);
+                    }
+                );
+            }
+        );
+    }
+
+    /**
      * Filter by file path starting with a string.
      *
      * @param string $string
@@ -38,14 +62,14 @@ class FileList
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $string . ')',
             function () use ($source, $string) {
                 return array_filter(
+                    $source(),
                     function ($file) use ($string) {
                         $fileLen = strlen($file);
                         $strnLen = strlen($string);
 
                         return $strnLen < $fileLen
                             && substr_compare($file, $string, 0, $strnLen) === 0;
-                    },
-                    $source()
+                    }
                 );
             }
         );
@@ -66,14 +90,14 @@ class FileList
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $string . ')',
             function () use ($source, $string) {
                 return array_filter(
+                    $source(),
                     function ($file) use ($string) {
                         $fileLen = strlen($file);
                         $strnLen = strlen($string);
 
                         return $fileLen > $strnLen
                             && substr_compare($file, $string, -$strnLen) === 0;
-                    },
-                    $source()
+                    }
                 );
             }
         );
