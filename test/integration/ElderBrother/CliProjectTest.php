@@ -28,7 +28,7 @@ class CliProjectTest extends BaseProjectTest
     {
         $this->assertNotFalse(file_put_contents('test1.php', '<?php echo "Hi!";'));
 
-        $this->assertCommandSuccessful(self::getEbCmd() . 'run --no-progress -e ' . self::CUSTOM_EVENT);
+        $this->assertCommandSuccessful(self::getEbCmd() . 'run -e ' . self::CUSTOM_EVENT);
     }
 
     /**
@@ -38,6 +38,6 @@ class CliProjectTest extends BaseProjectTest
     {
         $this->assertNotFalse(file_put_contents('test2.php', '<?php 3ch"o'));
 
-        $this->assertCommand(self::getEbCmd() . 'run --no-progress -e ' . self::CUSTOM_EVENT, 1);
+        $this->assertCommand(self::getEbCmd() . 'run -e ' . self::CUSTOM_EVENT, 1);
     }
 }

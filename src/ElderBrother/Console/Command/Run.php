@@ -65,7 +65,7 @@ class Run extends Command
 
         if (!empty($actions)) {
             // See https://github.com/symfony/symfony/pull/10356 for multiple bars
-            $progress = $input->hasOption('no-progress')
+            $progress = !$input->hasOption('no-progress')
                 ? new ProgressBar($output, count($actions))
                 : null;
             if ($progress) {

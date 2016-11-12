@@ -96,12 +96,13 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Runs a command and asserts that it was successful.
      *
-     * @param string $command The command to execute
-     * @param string $message Description of the assertion
+     * @param string        $command        The command to execute
+     * @param string[]|null $expectedOutput Expected stdout as array of lines (null to skip check)
+     * @param string        $message        Description of the assertion
      */
-    protected static function assertCommandSuccessful($command, $message = '')
+    protected static function assertCommandSuccessful($command, $expectedOutput = null, $message = '')
     {
-        static::assertCommand($command, 0, null, $message);
+        static::assertCommand($command, 0, $expectedOutput, $message);
     }
 
     /**
