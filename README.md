@@ -27,16 +27,28 @@ This tools makes it easy to set up these tasks, as well as putting such policies
 
 ## Installation
 
-Ideally, this should be installed with [Composer](https://getcomposer.org/):
-
+First add the library to your project with [Composer](https://getcomposer.org/):
 ```bash
 composer require uuf6429/elder-brother "~1.0"
 ```
 
+Next, add the following entry to your `composer.json`:
+```json
+{
+    "scripts": {
+        "post-install-cmd": "vendor/bin/elder-brother install",
+        "post-update-cmd": "vendor/bin/elder-brother install"
+    }
+}
+```
+
+**Note:** unfortunately, Composer scripts cannot be [disabled for non-dev runs](http://stackoverflow.com/q/13087088/314056), which is why Elder Brother cannot be loaded from `require-dev` only.
+On the bright side, all the extra modules (such as PHP-CS-Fixer) can be loaded with `require-dev`.
+
 ## Usage
 
 ### TODO
-- describe installation using composer install/update hooks
+- describe describe cli commands
 - describe creation of project-level config
 - describe creation of user-level config
 - describe available policies/actions

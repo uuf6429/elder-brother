@@ -2,11 +2,11 @@
 
 namespace uuf6429\ElderBrother\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use uuf6429\ElderBrother\Vcs\Manager;
 
-class Uninstall extends Command
+class Uninstall extends CommandAbstract
 {
     /**
      * {@inheritdoc}
@@ -14,9 +14,9 @@ class Uninstall extends Command
     protected function configure()
     {
         $this
-            ->setName('git-uninstall')
-            ->setDescription('Uninstalls git hooks.')
-            ->setHelp('This command removes all hooks to this system and restores original ones.')
+            ->setName('uninstall')
+            ->setDescription('Uninstalls VCS hooks.')
+            ->setHelp('This command removes all VCS hooks, restoring original ones.')
         ;
     }
 
@@ -25,6 +25,7 @@ class Uninstall extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        throw new \RuntimeException('Not implemented yet.');
+        $manager = new Manager($this->config->getLog());
+        $manager->uninstall();
     }
 }

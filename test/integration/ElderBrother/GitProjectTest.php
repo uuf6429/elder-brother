@@ -4,25 +4,35 @@ namespace uuf6429\ElderBrother;
 
 class GitProjectTest extends BaseProjectTest
 {
-    public function setUp()
-    {
-        $this->markTestSkipped('To be enabled when git (un)install works.');
-        parent::setUp();
-    }
-
     public function testInstallation()
     {
         $this->assertCommandSuccessful('git init');
+        $this->assertCommandSuccessful('git config user.email "john.doe@umbrella.mil"');
+        $this->assertCommandSuccessful('git config user.name "John Doe"');
+
+        $this->assertNotFalse(
+            file_put_contents('.git/hooks/post-commit', 'echo "OK"'),
+            'Create fake "old" hook.'
+        );
+
         $this->assertCommandSuccessful(self::getEbCmd() . 'install');
 
-        // TODO ensure git hook is as expected
+        $this->assertTrue(
+            file_exists('.git/hooks/pre-commit'),
+            'Pre-commit hook was not installed successfully.'
+        );
+
+        $this->assertTrue(
+            file_exists('.git/hooks/post-commit.bak'),
+            'Ensure "old" hook has been backed up.'
+        );
 
         $config = sprintf(
             '<%s return [%s => [%s]];',
             '?php',
             Event\Git::class . '::PRE_COMMIT',
             sprintf(
-                'new %s( %s::getAdded()->name("/.php$/") )',
+                'new %s( %s::getAdded() )',
                 Action\PhpLinter::class,
                 Change\GitChangeSet::class
             )
@@ -46,10 +56,10 @@ class GitProjectTest extends BaseProjectTest
      */
     public function testCommitingBadCode()
     {
-        $this->assertNotFalse(file_put_contents('test2.php', '<php ec ho'));
+        $this->assertNotFalse(file_put_contents('test2.php', '<?php 3ch"o'));
 
         $this->assertCommandSuccessful('git add .');
-        $this->assertCommand('git commit -m test2', 1, ['zxvzxz']);
+        $this->assertCommand('git commit -m test2', 1);
     }
 
     /**
@@ -60,6 +70,14 @@ class GitProjectTest extends BaseProjectTest
     {
         $this->assertCommandSuccessful(self::getEbCmd() . 'uninstall');
 
-        // TODO ensure git hook is as expected
+        $this->assertFalse(
+            file_exists('.git/hooks/pre-commit'),
+            'Pre-commit hook was not uninstalled successfully.'
+        );
+
+        $this->assertTrue(
+            file_exists('.git/hooks/post-commit'),
+            'Ensure "old" hook has been restored.'
+        );
     }
 }

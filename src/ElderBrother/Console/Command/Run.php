@@ -2,31 +2,14 @@
 
 namespace uuf6429\ElderBrother\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use uuf6429\ElderBrother\Config;
 use uuf6429\ElderBrother\Exception\RecoverableException;
 
-class Run extends Command
+class Run extends CommandAbstract
 {
-    /**
-     * @var Config
-     */
-    protected $config;
-
-    /**
-     * @param Config $config
-     */
-    public function __construct(Config $config)
-    {
-        parent::__construct(null);
-
-        $this->config = $config;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -97,13 +80,6 @@ class Run extends Command
                 $progress->finish();
             }
             $output->writeln('Done.');
-        } else {
-            $output->writeln(
-                sprintf(
-                    '<bg=yellow;fg=black;>%s</>',
-                    'No actions have been set up yet!'
-                )
-            );
         }
 
         return 0;

@@ -34,7 +34,15 @@ if (!$loaded) {
 
 unset($loaded, $paths);
 
+/**
+ * Path to the current user project dir (ending with path separator).
+ */
 define('PROJECT_ROOT', getcwd() . DIRECTORY_SEPARATOR);
+
+/**
+ * File path to program entry point.
+ */
+define('ELDER_BROTHER_BIN', __FILE__);
 
 use uuf6429\ElderBrother\Console\Application;
 $app = new Application();

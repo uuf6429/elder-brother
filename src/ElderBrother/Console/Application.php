@@ -41,8 +41,8 @@ class Application extends ConsoleApplication
         );
 
         $this->add(new Command\Run($this->config));
-        $this->add(new Command\Install());
-        $this->add(new Command\Uninstall());
+        $this->add(new Command\Install($this->config));
+        $this->add(new Command\Uninstall($this->config));
     }
 
     /**

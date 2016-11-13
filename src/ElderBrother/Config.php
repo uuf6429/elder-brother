@@ -116,4 +116,12 @@ class Config
 
         return $config;
     }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLog()
+    {
+        return $this->logger;
+    }
 }

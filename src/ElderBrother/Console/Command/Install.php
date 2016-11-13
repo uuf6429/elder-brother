@@ -2,11 +2,11 @@
 
 namespace uuf6429\ElderBrother\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use uuf6429\ElderBrother\Vcs\Manager;
 
-class Install extends Command
+class Install extends CommandAbstract
 {
     /**
      * {@inheritdoc}
@@ -14,9 +14,9 @@ class Install extends Command
     protected function configure()
     {
         $this
-            ->setName('git-install')
-            ->setDescription('Installs git hooks.')
-            ->setHelp('This command set up this system for use with a git repository.')
+            ->setName('install')
+            ->setDescription('Installs VCS hooks.')
+            ->setHelp('This command sets up project VCS hooks.')
         ;
     }
 
@@ -25,6 +25,7 @@ class Install extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        throw new \RuntimeException('Not implemented yet.');
+        $manager = new Manager($this->config->getLog());
+        $manager->install();
     }
 }
