@@ -2,6 +2,8 @@
 
 namespace uuf6429\ElderBrother\Action;
 
+use Symfony\Component\Console\Input;
+use Symfony\Component\Console\Output;
 use uuf6429\ElderBrother\Change;
 use uuf6429\ElderBrother\Exception\RecoverableException;
 
@@ -69,22 +71,20 @@ class RiskyFilesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Symfony\Component\Console\Input\InputInterface
+     * @return Input\InputInterface
      */
     protected function getInputMock()
     {
-        return $this->getMockBuilder(
-                \Symfony\Component\Console\Input\InputInterface::class
-            )->getMock();
+        return $this->getMockBuilder(Input\InputInterface::class)
+            ->getMock();
     }
 
     /**
-     * @return \Symfony\Component\Console\Output\OutputInterface
+     * @return Output\OutputInterface
      */
     protected function getOutputMock()
     {
-        return $this->getMockBuilder(
-                \Symfony\Component\Console\Output\OutputInterface::class
-            )->getMock();
+        return $this->getMockBuilder(Output\OutputInterface::class)
+            ->getMock();
     }
 }

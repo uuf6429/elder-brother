@@ -6,18 +6,18 @@ use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
 use uuf6429\ElderBrother\Change;
 
-class PhpLinterTest extends \PHPUnit_Framework_TestCase
+class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array           $fileContents
+     * @param null|array      $expectedFileContents
      * @param null|\Exception $expectedException
-     * @throws \Exception
      *
      * @throws \Exception
      *
      * @dataProvider validationScenarioDataProvider
      */
-    public function testValidationScenario($fileContents, $expectedException)
+    public function testValidationScenario($fileContents, $expectedFileContents = null, $expectedException = null)
     {
         $createdFiles = [];
 
@@ -30,10 +30,40 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                     return $createdFiles;
                 }
             );
-            $action = new PhpLinter($fileList);
+
+            $binFile = realpath(__DIR__ . '/../../../../vendor/friendsofphp/php-cs-fixer/php-cs-fixer');
+            $this->assertNotFalse($binFile, 'PHP-CS-Fixer executable could not be located (cwd: ' . getcwd() . ').');
+
+            $configFile = tempnam(sys_get_temp_dir(), 'pcc');
+            $this->assertNotFalse(
+                file_put_contents(
+                    $configFile,
+                    '<?php return Symfony\CS\Config\Config::create()'
+                    . '->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)'
+                    . '->fixers(["linefeed"]);'
+                ),
+                'PHP-CS-Fixer config file could not be saved: ' . $configFile
+            );
+
+            $action = new PhpCsFixer($fileList, $binFile, $configFile, false);
 
             try {
                 $action->execute($this->getInputMock(), $this->getOutputMock());
+
+                if (!is_null($expectedFileContents)) {
+                    $this->assertEquals(
+                        $expectedFileContents,
+                        array_combine(
+                            array_keys($fileContents),
+                            array_map(
+                                function ($file) {
+                                    return file($file, FILE_IGNORE_NEW_LINES);
+                                },
+                                $createdFiles
+                            )
+                        )
+                    );
+                }
 
                 $this->assertNull($expectedException, 'No exception should be thrown.');
             } catch (\Exception $ex) {
@@ -47,10 +77,6 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                     array_keys($fileContents),
                     $ex->getMessage()
                 );
-
-                // replace platform-specific text with general text
-                $aliases = ['Parse error:', 'Fatal error: Uncaught Error:', 'Fatal error:'];
-                $message = str_replace($aliases, '????:', $message);
 
                 // do some asserting :)
                 $this->assertSame(get_class($expectedException), get_class($ex));
@@ -72,39 +98,36 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
         return [
             'no files should not cause exception' => [
                 '$fileContents' => [],
+                '$expectedFileContents' => [],
                 '$expectedException' => null,
             ],
-            'a file with valid syntax' => [
+            'a file with an inline class and method' => [
                 '$fileContents' => [
-                    'file1.php' => '<?php echo "Test1"; ',
+                    'file1.php' => '<?php class Test {public function sayHello(){echo "Hello!";}} ',
+                ],
+                '$expectedFileContents' => [
+                    'file1.php' => [
+                        '<?php class Test',
+                        '{',
+                        '    public function sayHello()',
+                        '    {',
+                        '        echo \'Hello!\';',
+                        '    }',
+                        '}',
+                    ],
                 ],
                 '$expectedException' => null,
             ],
             'a file with a syntax error' => [
                 '$fileContents' => [
-                    'file2.php' => '<?php echo Test1"; ',
+                    'file2.php' => '<?php *e(cho Test1"; ',
                 ],
-                '$expectedException' => new \RuntimeException(
-                    'PhpLinter failed for the following file(s):' . PHP_EOL .
-                    '- file2.php:' . PHP_EOL .
-                    ' - ????: syntax error, unexpected \'"\', expecting \',\' or \';\' in file2.php on line 1'
-                ),
-            ],
-            'files with some errors' => [
-                '$fileContents' => [
-                    'file3.php' => '<?php echo Test1"; ',
-                    'file4.php' => '<?php echo "Test1"; ',
-                    'file6.php' => '',
-                    'file7.php' => '<?php return 0; ',
-                    'file8.php' => '<?php dgsda!^hfd ',
+                '$expectedFileContents' => [
+                    'file2.php' => [
+                        '<?php *e(cho Test1"; ',
+                    ],
                 ],
-                '$expectedException' => new \RuntimeException(
-                    'PhpLinter failed for the following file(s):' . PHP_EOL .
-                    '- file3.php:' . PHP_EOL .
-                    ' - ????: syntax error, unexpected \'"\', expecting \',\' or \';\' in file3.php on line 1' . PHP_EOL .
-                    '- file8.php:' . PHP_EOL .
-                    ' - ????: syntax error, unexpected \'!\' in file8.php on line 1'
-                ),
+                '$expectedException' => null,
             ],
         ];
     }
