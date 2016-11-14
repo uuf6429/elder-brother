@@ -29,30 +29,31 @@ This tools makes it easy to set up these tasks, as well as putting such policies
 
 ## Installation
 
-First add the library to your project with [Composer](https://getcomposer.org/):
-```bash
-composer require uuf6429/elder-brother "~1.0"
-```
+1. Add the library to your project with [Composer](https://getcomposer.org/):
+   ```bash
+   composer require uuf6429/elder-brother "~1.0"
+   ```
 
-Next, add the following entry to your `composer.json`:
-```json
-{
-    "scripts": {
-        "post-install-cmd": "vendor/bin/elder-brother install",
-        "post-update-cmd": "vendor/bin/elder-brother install"
-    }
-}
-```
+2. Add the following entry to your `composer.json`:
+   ```json
+   {
+       "scripts": {
+           "post-install-cmd": "vendor/bin/elder-brother install",
+           "post-update-cmd": "vendor/bin/elder-brother install"
+       }
+   }
+   ```
+   
+3. Create a `.brother.php` config file (as described below) and add `.brother.local.php` to your `.gitignore` file.
 
 **Note:** unfortunately, Composer scripts cannot be [disabled for non-dev runs](http://stackoverflow.com/q/13087088/314056), which is why Elder Brother cannot be loaded from `require-dev` only.
 On the bright side, all the extra modules (such as PHP-CS-Fixer) can be loaded with `require-dev`.
 
 ## Usage
 
-### TODO
-- **DESCRIBE CREATION OF PROJECT-LEVEL CONFIG**
-- **DESCRIBE CREATION OF USER-LEVEL CONFIG**
-- **DESCRIBE AVAILABLE POLICIES/ACTIONS**
+Elder Brother by default reads configuration from two files, `.brother.php` and `.brother.local.php` (which should be ignored by your VCS).
+
+
 
 ## Available Actions
 
