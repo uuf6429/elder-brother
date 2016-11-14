@@ -31,7 +31,7 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-            $binFile = realpath('../../../../vendor/friendsofphp/php-cs-fixer/php-cs-fixer');
+            $binFile = realpath(__DIR__ . '/../../../../vendor/friendsofphp/php-cs-fixer/php-cs-fixer');
             $this->assertNotFalse($binFile, 'PHP-CS-Fixer executable could not be located (cwd: ' . getcwd() . ').');
 
             $configFile = tempnam(sys_get_temp_dir(), 'pcc');
