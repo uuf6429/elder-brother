@@ -2,15 +2,15 @@
 
 namespace uuf6429\ElderBrother\Action;
 
-use uuf6429\ElderBrother\Change;
 use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
+use uuf6429\ElderBrother\Change;
 
 class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array           $fileContents
-     * @param null|array $expectedFileContents
+     * @param null|array      $expectedFileContents
      * @param null|\Exception $expectedException
      *
      * @throws \Exception
@@ -56,7 +56,7 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
                         array_combine(
                             array_keys($fileContents),
                             array_map(
-                                function($file){
+                                function ($file) {
                                     return file($file, FILE_IGNORE_NEW_LINES);
                                 },
                                 $createdFiles
@@ -114,7 +114,7 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
                         '        echo \'Hello!\';',
                         '    }',
                         '}',
-                    ]
+                    ],
                 ],
                 '$expectedException' => null,
             ],
@@ -151,6 +151,7 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array<string, string> $fileContents
+     *
      * @return string[]
      */
     protected function createFiles($fileContents)

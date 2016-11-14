@@ -2,9 +2,9 @@
 
 namespace uuf6429\ElderBrother\Action;
 
-use uuf6429\ElderBrother\Change;
 use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
+use uuf6429\ElderBrother\Change;
 
 class PhpLinterTest extends \PHPUnit_Framework_TestCase
 {
@@ -127,6 +127,7 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array<string, string> $fileContents
+     *
      * @return string[]
      */
     protected function createFiles($fileContents)

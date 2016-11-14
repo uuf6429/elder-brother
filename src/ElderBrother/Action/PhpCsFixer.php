@@ -24,17 +24,17 @@ class PhpCsFixer extends ActionAbstract
     protected $configFile;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $addAutomatically;
 
     /**
      * Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
      *
-     * @param FileList $files The files to check.
-     * @param string|null $binFile (Optional, default is from vendor) File path to PHP-CS-Fixer binary.
-     * @param string|null $configFile (Optional, default is project root) File path to PHP-CS-Fixer config.
-     * @param boolean $addAutomatically (Optional, default is true) Whether to add modified files to commit or not.
+     * @param FileList    $files            The files to check
+     * @param string|null $binFile          (Optional, default is from vendor) File path to PHP-CS-Fixer binary
+     * @param string|null $configFile       (Optional, default is project root) File path to PHP-CS-Fixer config
+     * @param bool        $addAutomatically (Optional, default is true) Whether to add modified files to commit or not
      */
     public function __construct(FileList $files, $binFile = null, $configFile = null, $addAutomatically = true)
     {

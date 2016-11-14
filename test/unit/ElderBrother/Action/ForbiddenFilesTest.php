@@ -3,9 +3,9 @@
 namespace uuf6429\ElderBrother\Action;
 
 use RuntimeException;
-use uuf6429\ElderBrother\Change;
 use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
+use uuf6429\ElderBrother\Change;
 
 class ForbiddenFilesTest extends \PHPUnit_Framework_TestCase
 {

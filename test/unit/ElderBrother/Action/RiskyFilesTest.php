@@ -2,10 +2,10 @@
 
 namespace uuf6429\ElderBrother\Action;
 
-use uuf6429\ElderBrother\Change;
-use uuf6429\ElderBrother\Exception\RecoverableException;
 use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
+use uuf6429\ElderBrother\Change;
+use uuf6429\ElderBrother\Exception\RecoverableException;
 
 class RiskyFilesTest extends \PHPUnit_Framework_TestCase
 {
