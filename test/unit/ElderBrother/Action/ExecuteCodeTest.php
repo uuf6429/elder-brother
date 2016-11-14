@@ -2,9 +2,9 @@
 
 namespace uuf6429\ElderBrother\Action;
 
-use uuf6429\ElderBrother\Config;
 use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
+use uuf6429\ElderBrother\Config;
 
 class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
 {

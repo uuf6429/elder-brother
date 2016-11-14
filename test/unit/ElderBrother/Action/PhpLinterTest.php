@@ -11,7 +11,6 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array           $fileContents
      * @param null|\Exception $expectedException
-     * @throws \Exception
      *
      * @throws \Exception
      *

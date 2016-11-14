@@ -18,8 +18,8 @@ class ExecuteCode extends ActionAbstract
     protected $callback;
 
     /**
-     * @param $description string Description of what this code does.
-     * @param $callback callable The callback to execute. The callback will receive $config, $input and $output as parameters.
+     * @param string   $description Description of what this code does
+     * @param callable $callback    The callback to execute. The callback will receive $config, $input and $output as parameters
      */
     public function __construct($description, $callback)
     {
@@ -46,7 +46,7 @@ class ExecuteCode extends ActionAbstract
     /**
      * Execute action for the given parameters.
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     public function execute(InputInterface $input, OutputInterface $output)

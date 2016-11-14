@@ -24,11 +24,7 @@ This tools makes it easy to set up these tasks, as well as putting such policies
   - [Installation](#installation)
   - [Usage](#usage)
   - [Available Actions](#available-actions)
-    - [Execute Custom Code (ExecuteCode)](#execute-custom-code-executecode)
-    - [Disallow Files (ForbiddenFiles)](#disallow-files-forbiddenfiles)
-    - [PHP Code Style Fixer (PhpCsFixer)](#php-code-style-fixer-phpcsfixer)
-    - [PHP Syntax Check (PhpLinter)](#php-syntax-check-phplinter)
-    - [Show Warning For Files (RiskyFiles)](#show-warning-for-files-riskyfiles)
+{{TOC_ACTIONS}}
   - [FAQ](#faq)
 
 ## Installation
@@ -60,48 +56,7 @@ On the bright side, all the extra modules (such as PHP-CS-Fixer) can be loaded w
 
 ## Available Actions
 
-### Execute Custom Code (ExecuteCode)
-
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$description` | `string` | Description of what this code does |
-| `$callback` | `callable` | The callback to execute. The callback will receive $config, $input and $output as parameters |
-*No Summary*
-
-### Disallow Files (ForbiddenFiles)
-
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | *None* |
-| `$reason` | `string` | *None* |
-Will stop process if $files is not empty, for the reason specified in $reason.
-
-### PHP Code Style Fixer (PhpCsFixer)
-
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | The files to check |
-| `$binFile` | `string|null` | (Optional, default is from vendor) File path to PHP-CS-Fixer binary |
-| `$configFile` | `string|null` | (Optional, default is project root) File path to PHP-CS-Fixer config |
-| `$addAutomatically` | `bool` | (Optional, default is true) Whether to add modified files to commit or not |
-Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
-
-### PHP Syntax Check (PhpLinter)
-
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | The files to check |
-Ensures that all the provided files are valid PHP files, terminating the
-process with an error and non-zero exit code, if not.
-
-### Show Warning For Files (RiskyFiles)
-
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | *None* |
-| `$reason` | `string` | *None* |
-Will show a warning if $files is not empty, for the reason specified in $reason.
-
+{{SECTION_ACTIONS}}
 
 ## FAQ
 
