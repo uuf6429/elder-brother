@@ -3,12 +3,16 @@
 namespace uuf6429\ElderBrother\Action;
 
 use uuf6429\ElderBrother\Change;
+use Symfony\Component\Console\Input;
+use Symfony\Component\Console\Output;
 
 class PhpLinterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array           $fileContents
      * @param null|\Exception $expectedException
+     *
+     * @throws \Exception
      *
      * @dataProvider validationScenarioDataProvider
      */
@@ -105,25 +109,25 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Symfony\Component\Console\Input\InputInterface
+     * @return Input\InputInterface
      */
     protected function getInputMock()
     {
-        return $this->getMockBuilder(
-                \Symfony\Component\Console\Input\InputInterface::class
-            )->getMock();
+        return $this->getMockBuilder(Input\InputInterface::class)
+            ->getMock();
     }
 
     /**
-     * @return \Symfony\Component\Console\Output\OutputInterface
+     * @return Output\OutputInterface
      */
     protected function getOutputMock()
     {
-        return new \Symfony\Component\Console\Output\NullOutput();
+        return new Output\NullOutput();
     }
 
     /**
      * @param array<string, string> $fileContents
+     * @return string[]
      */
     protected function createFiles($fileContents)
     {
