@@ -6,9 +6,15 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use uuf6429\ElderBrother\Config;
 
 abstract class ActionAbstract
 {
+    /**
+     * @var Config
+     */
+    protected $config;
+
     /**
      * Returns name of this action (possibly with some extra info).
      *
@@ -49,5 +55,13 @@ abstract class ActionAbstract
         $progress->setRedrawFrequency(1);
 
         return $progress;
+    }
+
+    /**
+     * @param Config $config
+     */
+    public function setConfig(Config $config)
+    {
+        $this->config = $config;
     }
 }

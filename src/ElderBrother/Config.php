@@ -34,39 +34,6 @@ class Config
     }
 
     /**
-     * @return self
-     */
-    protected function load()
-    {
-        $this->config = [];
-
-        foreach ($this->paths as $path) {
-            if (file_exists($path)) {
-                $this->logger->debug('Loading config file: ' . $path);
-
-                $config = include $path;
-
-                foreach ($config as $event => $prioritizedActions) {
-                    // merge config
-                    $this->config[$event] = array_merge(
-                        isset($this->config[$event]) ? $this->config[$event] : [],
-                        $prioritizedActions
-                    );
-
-                    // reorder actions
-                    ksort($this->config[$event]);
-                }
-            } else {
-                $this->logger->debug('Config file does not exist: ' . $path);
-            }
-        }
-
-        $this->logger->debug('Configuration loaded.');
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getAll()
@@ -110,6 +77,8 @@ class Config
                             )
                         );
                     }
+
+                    return false;
                 }
             );
         }
@@ -123,5 +92,61 @@ class Config
     public function getLog()
     {
         return $this->logger;
+    }
+
+    /**
+     * @return self
+     */
+    protected function load()
+    {
+        $this->config = [];
+
+        $this->logger->debug('Loading configuration...');
+
+        foreach ($this->paths as $path) {
+            $this->loadFile($path);
+        }
+
+        $this->initActions();
+
+        $this->logger->debug('Configuration loaded.');
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     */
+    private function loadFile($path)
+    {
+        if (file_exists($path)) {
+            $this->logger->debug('Loading config file: ' . $path);
+
+            $config = include $path;
+
+            foreach ($config as $event => $prioritizedActions) {
+                // merge config
+                $this->config[$event] = array_merge(
+                    isset($this->config[$event]) ? $this->config[$event] : [],
+                    $prioritizedActions
+                );
+
+                // reorder actions
+                ksort($this->config[$event]);
+            }
+        } else {
+            $this->logger->debug('Config file does not exist: ' . $path);
+        }
+    }
+
+    private function initActions()
+    {
+        foreach ($this->config as $actionList) {
+            foreach ($actionList as $action) {
+                if ($action instanceof ActionAbstract) {
+                    $action->setConfig($this);
+                }
+            }
+        }
     }
 }

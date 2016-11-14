@@ -33,7 +33,7 @@
         }
     },
     "suggest": {
-        "friendsofphp/php-cs-fixer": "Needed for PhpCsFixerAction"
+        "friendsofphp/php-cs-fixer": "Needed for PhpCsFixer action"
     },
     "bin": ["elder-brother"]
 }
