@@ -16,6 +16,11 @@ class PhpCsFixer extends ActionAbstract
     /**
      * @var string|null
      */
+    protected $binFile;
+
+    /**
+     * @var string|null
+     */
     protected $configFile;
 
     /**
@@ -26,13 +31,15 @@ class PhpCsFixer extends ActionAbstract
     /**
      * Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
      *
-     * @param FileList $files The files to check
-     * @param string|null $configFile (Optional, default is project root) File path to PHP-CS-Fixer config
+     * @param FileList $files The files to check.
+     * @param string|null $binFile (Optional, default is from vendor) File path to PHP-CS-Fixer binary.
+     * @param string|null $configFile (Optional, default is project root) File path to PHP-CS-Fixer config.
      * @param boolean $addAutomatically (Optional, default is true) Whether to add modified files to commit or not.
      */
-    public function __construct(FileList $files, $configFile = null, $addAutomatically = true)
+    public function __construct(FileList $files, $binFile = null, $configFile = null, $addAutomatically = true)
     {
         $this->files = $files;
+        $this->binFile = $binFile ?: $this->getBinFile();
         $this->configFile = $configFile;
         $this->addAutomatically = $addAutomatically;
     }
@@ -50,7 +57,7 @@ class PhpCsFixer extends ActionAbstract
      */
     public function checkSupport()
     {
-        return file_exists($this->getBinFile());
+        return file_exists($this->binFile);
     }
 
     /**
@@ -64,7 +71,6 @@ class PhpCsFixer extends ActionAbstract
         $progress->start();
 
         $failed = [];
-        $fixer = $this->getBinFile();
 
         foreach ($files as $file) {
             $progress->setMessage('Processing ' . $file . '...');
@@ -74,7 +80,7 @@ class PhpCsFixer extends ActionAbstract
             exec(
                 sprintf(
                     'php -f %s fix %s %s',
-                    escapeshellarg($fixer),
+                    escapeshellarg($this->binFile),
                     escapeshellarg($file),
                     $this->configFile ? ('--config-file=' . escapeshellarg($this->configFile)) : ''
                 ),
@@ -118,6 +124,9 @@ class PhpCsFixer extends ActionAbstract
      */
     protected function getBinFile()
     {
-        return PROJECT_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'php-cs-fixer';
+        return PROJECT_ROOT . 'vendor'
+            . DIRECTORY_SEPARATOR . 'friendsofphp'
+            . DIRECTORY_SEPARATOR . 'php-cs-fixer'
+            . DIRECTORY_SEPARATOR . 'php-cs-fixer';
     }
 }
