@@ -43,7 +43,7 @@ class GitProjectTest extends BaseProjectTest
     /**
      * @depends testInstallation
      */
-    public function testCommitingGoodCode()
+    public function testCommittingGoodCode()
     {
         $this->assertNotFalse(file_put_contents('test1.php', '<php echo "Hi!";'));
 
@@ -52,9 +52,9 @@ class GitProjectTest extends BaseProjectTest
     }
 
     /**
-     * @depends testCommitingGoodCode
+     * @depends testCommittingGoodCode
      */
-    public function testCommitingBadCode()
+    public function testCommittingBadCode()
     {
         $this->assertNotFalse(file_put_contents('test2.php', '<?php 3ch"o'));
 
@@ -63,8 +63,8 @@ class GitProjectTest extends BaseProjectTest
     }
 
     /**
-     * @depends testCommitingGoodCode
-     * @depends testCommitingBadCode
+     * @depends testCommittingGoodCode
+     * @depends testCommittingBadCode
      */
     public function testUninstallation()
     {
