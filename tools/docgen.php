@@ -2,7 +2,13 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use \phpDocumentor\Reflection\DocBlock\Tags\Param;
 use \phpDocumentor\Reflection\DocBlockFactory;
+use \Symfony\Component\Debug;
+use \uuf6429\ElderBrother\Action\ActionAbstract;
+
+Debug\ErrorHandler::register();
+Debug\ExceptionHandler::register();
 
 $docBlockFactory = DocBlockFactory::createInstance();
 $tocActions = [];
@@ -20,7 +26,7 @@ foreach (glob(__DIR__ . '/../src/ElderBrother/Action/*.php') as $file) {
         $constructor = $reflector->getMethod('__construct');
         $docBlock = $docBlockFactory->create($constructor);
 
-        /** @var \uuf6429\ElderBrother\Action\ActionAbstract $object */
+        /** @var ActionAbstract $object */
         $object = $reflector->newInstanceWithoutConstructor();
 
         $tocActions[] = sprintf(
@@ -32,26 +38,29 @@ foreach (glob(__DIR__ . '/../src/ElderBrother/Action/*.php') as $file) {
                 strtolower($object->getName())
             )
         );
-
-        $secActions[] = '### ' . ucwords($object->getName());
-        $secActions[] = '';
         $params = $docBlock->getTagsByName('param');
-        if (count($params)) {
-            $secActions[] = '| Parameter  | Type | Description |';
-            $secActions[] = '|------------|------|-------------|';
-            /** @var \phpDocumentor\Reflection\DocBlock\Tags\Param $param */
-            foreach ($params as $param) {
-                $secActions[] = sprintf(
-                    '| `$%s` | %s | %s |',
-                    $param->getVariableName(),
-                    trim($param->getType())
-                        ? '`' . trim($param->getType()) . '`'
-                        : '*unknown*',
-                    trim($param->getDescription()) ?: '*None*'
-                );
-            }
+        $signature = 'new ' . $reflector->getShortName() . '(';
+        foreach ($params as $i => $param) {
+            /** @var Param $param */
+            $isLast = $i == (count($params) - 1);
+            $signature .= sprintf(
+                "\n    %s\$%s%s%s%s",
+                (bool) ($type = trim($param->getType())) ? "$type " : '',
+                $param->getVariableName(),
+                $isLast ? '' : ',',
+                (bool) ($desc = trim($param->getDescription())) ? " // $desc" : '',
+                $isLast ? "\n" : ''
+            );
         }
+        $signature .= ')';
 
+        $secActions[] = sprintf(
+            '### [%s](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/%s.php)',
+            ucwords($object->getName()),
+            $reflector->getShortName()
+        );
+        $secActions[] = '';
+        $secActions[] = "```php\n$signature\n```";
         $secActions[] = trim($docBlock->getSummary()) ?: '*No Summary*';
         $secActions[] = '';
     } catch (\Exception $ex) {
@@ -74,3 +83,5 @@ file_put_contents(
         file_get_contents(__DIR__ . '/template.md')
     )
 );
+
+echo 'Done.';

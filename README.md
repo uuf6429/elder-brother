@@ -33,73 +33,110 @@ This tools makes it easy to set up these tasks, as well as putting such policies
 
 ## Installation
 
-First add the library to your project with [Composer](https://getcomposer.org/):
-```bash
-composer require uuf6429/elder-brother "~1.0"
-```
+1. Add the library to your project with [Composer](https://getcomposer.org/):
+   ```bash
+   $ composer require neronmoon/scriptsdev
+   $ composer require uuf6429/elder-brother "~1.0" --dev
+   ```
+   **Notes:**
+   - in this way, *Elder Brother* will only be installed during development (Composer should be run with `--no-dev` in production).
+   - `scriptsdev` package will make installation work during development and not break during production.
+   - you may still have to install additional packages (detailed below) to use some particular actions.
 
-Next, add the following entry to your `composer.json`:
-```json
-{
-    "scripts": {
-        "post-install-cmd": "vendor/bin/elder-brother install",
-        "post-update-cmd": "vendor/bin/elder-brother install"
-    }
-}
-```
-
-**Note:** unfortunately, Composer scripts cannot be [disabled for non-dev runs](http://stackoverflow.com/q/13087088/314056), which is why Elder Brother cannot be loaded from `require-dev` only.
-On the bright side, all the extra modules (such as PHP-CS-Fixer) can be loaded with `require-dev`.
+2. Add the following entry to your `composer.json`:
+   ```json
+   {
+       "scripts-dev": {
+           "post-install-cmd": "vendor/bin/elder-brother install",
+           "post-update-cmd": "vendor/bin/elder-brother install"
+       }
+   }
+   ```
+   
+3. Create a `.brother.php` config file (as described below) and add `.brother.local.php` to your `.gitignore` file (this allows for user-level config).
 
 ## Usage
 
-### TODO
-- **DESCRIBE CREATION OF PROJECT-LEVEL CONFIG**
-- **DESCRIBE CREATION OF USER-LEVEL CONFIG**
-- **DESCRIBE AVAILABLE POLICIES/ACTIONS**
+Elder Brother by default reads configuration from two files, `.brother.php` and `.brother.local.php` (which should be ignored by your VCS).
+
+A typical configuration file will be structured like this:
+```php
+<?php
+
+use uuf6429\ElderBrother\Action;
+use uuf6429\ElderBrother\Event;
+use uuf6429\ElderBrother\Change\GitChangeSet;
+
+return [
+    Event\Git::PRE_COMMIT => [
+        1 => new Action\PhpLinter(
+                GitChangeSet::getAddedCopiedModified()
+                    ->name('/\\.php$/')
+            ),
+        2 => new Action\PhpCsFixer(
+                GitChangeSet::getAddedCopiedModified()
+                    ->name('/\\.php$/')
+            ),
+    ]
+];
+```
+Basically, the configuration is an array of actions grouped by event.
+In the above example, `PhpLinter` and `PhpCsFixer` actions will check all files (`GitChangeSet::getAddedCopiedModified()`) in the commit before it takes place (`Event\Git::PRE_COMMIT`).
+It is recommended that you give each action a defined numeric index, so that they can be easily overridden by user config.
+Note that no matter how the items look like in the array, action execution starts from the smallest index.
 
 ## Available Actions
 
-### Execute Custom Code (ExecuteCode)
+### [Execute Custom Code (ExecuteCode)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/ExecuteCode.php)
 
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$description` | `string` | Description of what this code does |
-| `$callback` | `callable` | The callback to execute. The callback will receive $config, $input and $output as parameters |
+```php
+new ExecuteCode(
+    string $description, // Description of what this code does
+    callable $callback // The callback to execute. The callback will receive $config, $input and $output as parameters
+)
+```
 *No Summary*
 
-### Disallow Files (ForbiddenFiles)
+### [Disallow Files (ForbiddenFiles)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/ForbiddenFiles.php)
 
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | *None* |
-| `$reason` | `string` | *None* |
+```php
+new ForbiddenFiles(
+    \FileList $files,
+    string $reason
+)
+```
 Will stop process if $files is not empty, for the reason specified in $reason.
 
-### PHP Code Style Fixer (PhpCsFixer)
+### [PHP Code Style Fixer (PhpCsFixer)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/PhpCsFixer.php)
 
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | The files to check |
-| `$binFile` | `string|null` | (Optional, default is from vendor) File path to PHP-CS-Fixer binary |
-| `$configFile` | `string|null` | (Optional, default is project root) File path to PHP-CS-Fixer config |
-| `$addAutomatically` | `bool` | (Optional, default is true) Whether to add modified files to commit or not |
+```php
+new PhpCsFixer(
+    \FileList $files, // The files to check
+    string|null $binFile, // (Optional, default is from vendor) File path to PHP-CS-Fixer binary
+    string|null $configFile, // (Optional, default is project root) File path to PHP-CS-Fixer config
+    bool $addAutomatically // (Optional, default is true) Whether to add modified files to commit or not
+)
+```
 Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
 
-### PHP Syntax Check (PhpLinter)
+### [PHP Syntax Check (PhpLinter)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/PhpLinter.php)
 
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | The files to check |
+```php
+new PhpLinter(
+    \FileList $files // The files to check
+)
+```
 Ensures that all the provided files are valid PHP files, terminating the
 process with an error and non-zero exit code, if not.
 
-### Show Warning For Files (RiskyFiles)
+### [Show Warning For Files (RiskyFiles)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/RiskyFiles.php)
 
-| Parameter  | Type | Description |
-|------------|------|-------------|
-| `$files` | `\FileList` | *None* |
-| `$reason` | `string` | *None* |
+```php
+new RiskyFiles(
+    \FileList $files,
+    string $reason
+)
+```
 Will show a warning if $files is not empty, for the reason specified in $reason.
 
 
