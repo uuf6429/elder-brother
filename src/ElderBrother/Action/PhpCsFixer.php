@@ -4,6 +4,7 @@ namespace uuf6429\ElderBrother\Action;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 use uuf6429\ElderBrother\Change\FileList;
 
 class PhpCsFixer extends ActionAbstract
@@ -75,20 +76,17 @@ class PhpCsFixer extends ActionAbstract
         foreach ($files as $file) {
             $progress->setMessage('Processing ' . $file . '...');
 
-            $outp = null;
-            $exit = null;
-            exec(
+            $process = new Process(
                 sprintf(
-                    'php -f %s fix %s %s',
+                    'php -f %s -- fix %s %s',
                     escapeshellarg($this->binFile),
                     escapeshellarg($file),
                     $this->configFile ? ('--config-file=' . escapeshellarg($this->configFile)) : ''
-                ),
-                $outp,
-                $exit
+                )
             );
+            $process->run();
 
-            switch ((int) $exit) {
+            switch ($process->getExitCode()) {
                 case 0:
                     // file has been changed
                     if ($this->addAutomatically) {
@@ -100,7 +98,7 @@ class PhpCsFixer extends ActionAbstract
                     break;
                 default:
                     // some sort of error
-                    $failed[$file] = $outp;
+                    $failed[$file] = explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput()));
                     break;
             }
 

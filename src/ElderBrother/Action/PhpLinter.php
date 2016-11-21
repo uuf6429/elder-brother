@@ -4,6 +4,7 @@ namespace uuf6429\ElderBrother\Action;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 use uuf6429\ElderBrother\Change\FileList;
 
 class PhpLinter extends ActionAbstract
@@ -35,15 +36,14 @@ class PhpLinter extends ActionAbstract
      */
     public function checkSupport()
     {
-        $output = $exitCode = null;
-        exec('php -v', $output, $exitCode);
+        $process = new Process('php -v');
 
-        if ($exitCode !== 0) {
+        if ($process->run() !== 0) {
             throw new \RuntimeException(
                 sprintf(
                     'PHP could not be executed successfully (exit code: %d): %s',
-                    $exitCode,
-                    (count($output) > 1 ? PHP_EOL : '') . implode(PHP_EOL, $output)
+                    $process->getExitCode(),
+                    $process->getOutput()
                 )
             );
         }
@@ -63,14 +63,11 @@ class PhpLinter extends ActionAbstract
 
         foreach ($files as $file) {
             $progress->setMessage('Processing ' . $file . '...');
+            $process = new Process('php -l ' . escapeshellarg($file));
 
-            $outp = null;
-            $exit = null;
-            exec('php -l ' . escapeshellarg($file), $outp, $exit);
-
-            if ($exit) {
+            if ($process->run() !== 0) {
                 $failed[$file] = array_filter(
-                    $outp,
+                    explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput())),
                     function ($line) {
                         return strlen($line)
                             && substr($line, 0, 15) !== 'Errors parsing ';

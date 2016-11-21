@@ -2,6 +2,8 @@
 
 namespace uuf6429\ElderBrother;
 
+use Symfony\Component\Process\Process;
+
 abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -45,16 +47,16 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
         );
         foreach ($files as $file) {
             if ($file->isDir()) {
-                rmdir($file->getRealPath());
+                @rmdir($file->getRealPath());
             } else {
-                unlink($file->getRealPath());
+                @unlink($file->getRealPath());
             }
         }
 
         chdir(self::$oldWorkingDirectory);
 
-        if (rmdir(self::$projectPath)) {
-            unlink(self::$projectLockFile);
+        if (@rmdir(self::$projectPath)) {
+            @unlink(self::$projectLockFile);
         }
 
         parent::tearDownAfterClass();
@@ -70,18 +72,18 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
      */
     protected static function assertCommand($command, $expectedResult, $expectedOutput = null, $message = '')
     {
-        $actualResult = null;
-        $actualOutput = null;
-        $command .= ' 2>&1';
+        $process = new Process($command);
+        $process->run();
 
-        exec($command, $actualOutput, $actualResult);
+        $actualResult = $process->getExitCode();
+        $actualOutput = explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput()));
 
         if (!$message) {
             $sep = PHP_EOL . '- ';
             $message = sprintf(
                 'Command:%sResult (exit: %s):%s',
                 $sep . $command . PHP_EOL,
-                $actualResult,
+                $process->getExitCode(),
                 $sep . implode($sep, $actualOutput)
             );
         }
