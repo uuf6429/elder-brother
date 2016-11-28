@@ -12,10 +12,15 @@ php:
     - 7.0
     - hhvm
 
-install: composer update --prefer-dist
+install:
+    - chmod 0777 ./elder-brother
+    - composer update --prefer-dist
 
 script:
     - vendor/bin/phpunit --coverage-clover=coverage.xml
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+    email: false

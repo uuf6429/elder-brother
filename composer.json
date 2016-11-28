@@ -35,5 +35,9 @@
     "suggest": {
         "friendsofphp/php-cs-fixer": "Needed for PhpCsFixer action"
     },
-    "bin": ["elder-brother"]
+    "bin": ["elder-brother"],
+    "scripts": {
+        "post-install-cmd": "php elder-brother install",
+        "post-update-cmd": "php elder-brother install"
+    }
 }

@@ -74,6 +74,9 @@ coding_style:
 build:
     environment:
         php: '7.0'
+    dependencies:
+        before:
+            - chmod 0777 ./elder-brother
     tests:
         override:
             -
