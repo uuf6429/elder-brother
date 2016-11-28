@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/uuf6429/elder-brother/master/LICENSE)
 [![Coverage](https://codecov.io/gh/uuf6429/elder-brother/branch/master/graph/badge.svg?token=Bu2nK2Kq77)](https://codecov.io/github/uuf6429/elder-brother?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/uuf6429/elder-brother/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/uuf6429/elder-brother/?branch=master)
-[![Packagist](https://img.shields.io/packagist/v/uuf6429/ElderBrother.svg)](https://packagist.org/packages/uuf6429/ElderBrother)
+[![Packagist](https://img.shields.io/packagist/v/uuf6429/elder-brother.svg)](https://packagist.org/packages/uuf6429/elder-brother)
 
 Elder Brother automatically regulates contributions before reaching your project.
 
