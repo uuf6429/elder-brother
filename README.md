@@ -25,6 +25,7 @@ This tools makes it easy to set up these tasks, as well as putting such policies
   - [Usage](#usage)
   - [Available Actions](#available-actions)
     - [Execute Custom Code (ExecuteCode)](#execute-custom-code-executecode)
+    - [Execute External Program (ExecuteProgram)](#execute-external-program-executeprogram)
     - [Disallow Files (ForbiddenFiles)](#disallow-files-forbiddenfiles)
     - [PHP Code Style Fixer (PhpCsFixer)](#php-code-style-fixer-phpcsfixer)
     - [PHP Syntax Check (PhpLinter)](#php-syntax-check-phplinter)
@@ -91,11 +92,25 @@ Note that no matter how the items look like in the array, action execution start
 
 ```php
 new ExecuteCode(
-    string $description, // Description of what this code does
-    callable $callback // The callback to execute. The callback will receive $config, $input and $output as parameters
+    string $description, // Description of the intention of the callback
+    callable $callback // The callback to execute. It will receive $config, $input and $output as parameters
 )
 ```
-*No Summary*
+Executes the passed callback, function or static method.
+
+### [Execute External Program (ExecuteProgram)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/ExecuteProgram.php)
+
+```php
+new ExecuteProgram(
+    string $description, // Description of the intention of the program
+    string $command, // Program command line (with parameters)
+    bool $breakOnFailure, // (Optional, default is true) Stop execution if program returns non-0 exit code
+    array|null $environment, // (Optional, default is null / current vars) Environment variables to pass to program
+    string|null $currentDir, // The current directory to use for program
+    int $timeout // (Optional, default is 60) The time to wait for program to finish (in seconds)
+)
+```
+Executes an external program.
 
 ### [Disallow Files (ForbiddenFiles)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/ForbiddenFiles.php)
 
@@ -105,7 +120,7 @@ new ForbiddenFiles(
     string $reason
 )
 ```
-Will stop process if $files is not empty, for the reason specified in $reason.
+Will stop process if `$files` is not empty, for the reason specified in `$reason`.
 
 ### [PHP Code Style Fixer (PhpCsFixer)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/PhpCsFixer.php)
 
@@ -137,7 +152,7 @@ new RiskyFiles(
     string $reason
 )
 ```
-Will show a warning if $files is not empty, for the reason specified in $reason.
+Will show a warning if `$files` is not empty, for the reason specified in `$reason`.
 
 
 ## FAQ

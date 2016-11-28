@@ -30,5 +30,7 @@ class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(\RuntimeException::class, 'Testing');
 
         $action->execute(new Input\StringInput(''), new Output\NullOutput());
+
+        $this->assertSame('Do something (ExecuteCode)', $action->getName());
     }
 }

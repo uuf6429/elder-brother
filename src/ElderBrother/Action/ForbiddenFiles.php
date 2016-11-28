@@ -18,7 +18,7 @@ class ForbiddenFiles extends ActionAbstract
     protected $reason;
 
     /**
-     * Will stop process if $files is not empty, for the reason specified in $reason.
+     * Will stop process if `$files` is not empty, for the reason specified in `$reason`.
      *
      * @param FileList $files
      * @param string   $reason

@@ -18,7 +18,7 @@ class RiskyFiles extends ActionAbstract
     protected $reason;
 
     /**
-     * Will show a warning if $files is not empty, for the reason specified in $reason.
+     * Will show a warning if `$files` is not empty, for the reason specified in `$reason`.
      *
      * @param FileList $files
      * @param string   $reason
