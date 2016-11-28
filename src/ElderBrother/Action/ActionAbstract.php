@@ -2,16 +2,19 @@
 
 namespace uuf6429\ElderBrother\Action;
 
+use Psr\Log;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use uuf6429\ElderBrother\Config;
 
-abstract class ActionAbstract
+abstract class ActionAbstract implements Config\ConfigAwareInterface, Log\LoggerAwareInterface
 {
+    use Log\LoggerAwareTrait;
+
     /**
-     * @var Config
+     * @var Config\ConfigInterface
      */
     protected $config;
 
@@ -23,11 +26,11 @@ abstract class ActionAbstract
     abstract public function getName();
 
     /**
-     * Throws an exception when action is not supported (eg: missing lib etc).
+     * Returns false when action is not supported (eg: missing lib etc).
      *
-     * @throws \Exception
+     * @return bool
      */
-    abstract public function checkSupport();
+    abstract public function isSupported();
 
     /**
      * Execute action for the given parameters.
@@ -58,9 +61,9 @@ abstract class ActionAbstract
     }
 
     /**
-     * @param Config $config
+     * @param Config\ConfigInterface $config
      */
-    public function setConfig(Config $config)
+    public function setConfig(Config\ConfigInterface $config)
     {
         $this->config = $config;
     }

@@ -29,16 +29,25 @@ class RiskyFiles extends ActionAbstract
         $this->reason = $reason;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'Show warning for files (RiskyFiles)';
     }
 
-    public function checkSupport()
+    /**
+     * {@inheritdoc}
+     */
+    public function isSupported()
     {
-        // no special dependencies
+        return true; // no special dependencies
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $files = $this->files->toArray();

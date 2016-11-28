@@ -29,16 +29,25 @@ class ForbiddenFiles extends ActionAbstract
         $this->reason = $reason;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'Disallow files (ForbiddenFiles)';
     }
 
-    public function checkSupport()
+    /**
+     * {@inheritdoc}
+     */
+    public function isSupported()
     {
-        // no special dependencies
+        return true; // no special dependencies
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $files = $this->files->toArray();

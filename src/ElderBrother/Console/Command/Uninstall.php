@@ -25,7 +25,7 @@ class Uninstall extends CommandAbstract
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $manager = new Manager($this->config->getLog());
+        $manager = new Manager($this->logger);
         $manager->uninstall();
     }
 }

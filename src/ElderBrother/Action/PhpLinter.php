@@ -34,12 +34,12 @@ class PhpLinter extends ActionAbstract
     /**
      * {@inheritdoc}
      */
-    public function checkSupport()
+    public function isSupported()
     {
         $process = new Process('php -v');
 
         if ($process->run() !== 0) {
-            throw new \RuntimeException(
+            $this->logger->warning(
                 sprintf(
                     'PHP could not be executed successfully (exit code: %d): %s',
                     $process->getExitCode(),
@@ -47,6 +47,8 @@ class PhpLinter extends ActionAbstract
                 )
             );
         }
+
+        return $process->isSuccessful();
     }
 
     /**

@@ -4,7 +4,7 @@ namespace uuf6429\ElderBrother\Action;
 
 use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
-use uuf6429\ElderBrother\Config;
+use uuf6429\ElderBrother\Config\ConfigInterface;
 
 class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
         $action = new ExecuteCode(
             'Do something',
             function ($config, $input, $output) {
-                $this->assertInstanceOf(Config::class, $config);
+                $this->assertInstanceOf(ConfigInterface::class, $config);
                 $this->assertInstanceOf(Input\InputInterface::class, $input);
                 $this->assertInstanceOf(Output\OutputInterface::class, $output);
 
@@ -22,7 +22,7 @@ class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
         );
 
         $action->setConfig(
-            $this->getMockBuilder(Config::class)
+            $this->getMockBuilder(ConfigInterface::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );

@@ -44,7 +44,7 @@ class Run extends CommandAbstract
         }
 
         $event = $input->getOption('event');
-        $actions = $this->config->get($event);
+        $actions = $this->config->getActionsForEvent($event);
 
         if (!empty($actions)) {
             // See https://github.com/symfony/symfony/pull/10356 for multiple bars

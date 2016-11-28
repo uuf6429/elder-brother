@@ -38,9 +38,9 @@ class ExecuteCode extends ActionAbstract
     /**
      * {@inheritdoc}
      */
-    public function checkSupport()
+    public function isSupported()
     {
-        // no special dependencies
+        return true; // no special dependencies
     }
 
     /**

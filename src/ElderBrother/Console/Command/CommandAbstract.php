@@ -2,23 +2,24 @@
 
 namespace uuf6429\ElderBrother\Console\Command;
 
+use Psr\Log;
 use Symfony\Component\Console\Command\Command;
 use uuf6429\ElderBrother\Config;
 
-abstract class CommandAbstract extends Command
+abstract class CommandAbstract extends Command implements Config\ConfigAwareInterface, Log\LoggerAwareInterface
 {
+    use Log\LoggerAwareTrait;
+
     /**
-     * @var Config
+     * @var Config\ConfigInterface
      */
     protected $config;
 
     /**
-     * @param Config $config
+     * @param Config\ConfigInterface $config
      */
-    public function __construct(Config $config)
+    public function setConfig(Config\ConfigInterface $config)
     {
-        parent::__construct(null);
-
         $this->config = $config;
     }
 }

@@ -56,9 +56,20 @@ class PhpCsFixer extends ActionAbstract
     /**
      * {@inheritdoc}
      */
-    public function checkSupport()
+    public function isSupported()
     {
-        return file_exists($this->binFile);
+        if (!file_exists($this->binFile)) {
+            $this->logger->warning(
+                sprintf(
+                    'PHP-CS-Fixer could not be found in: %s',
+                    $this->binFile
+                )
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
