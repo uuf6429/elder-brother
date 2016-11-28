@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input;
 use Symfony\Component\Console\Output;
 use uuf6429\ElderBrother\Change;
 
-class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
+class PhpCsFixerOldTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array           $fileContents
@@ -31,7 +31,21 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-            $action = new PhpCsFixer($fileList, PhpCsFixer::SYMFONY_LEVEL, ['linefeed'], false, false);
+            $binFile = realpath(__DIR__ . '/../../../../vendor/friendsofphp/php-cs-fixer/php-cs-fixer');
+            $this->assertNotFalse($binFile, 'PHP-CS-Fixer executable could not be located (cwd: ' . getcwd() . ').');
+
+            $configFile = tempnam(sys_get_temp_dir(), 'pcc');
+            $this->assertNotFalse(
+                file_put_contents(
+                    $configFile,
+                    '<?php return Symfony\CS\Config\Config::create()'
+                    . '->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)'
+                    . '->fixers(["linefeed"]);'
+                ),
+                'PHP-CS-Fixer config file could not be saved: ' . $configFile
+            );
+
+            $action = new PhpCsFixerOld($fileList, $binFile, $configFile, false);
 
             try {
                 $action->execute($this->getInputMock(), $this->getOutputMock());

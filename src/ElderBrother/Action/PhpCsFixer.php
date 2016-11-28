@@ -4,25 +4,33 @@ namespace uuf6429\ElderBrother\Action;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\SplFileInfo as SfyFileInfo;
 use Symfony\Component\Process\Process;
 use uuf6429\ElderBrother\Change\FileList;
 
 class PhpCsFixer extends ActionAbstract
 {
+    const NONE_LEVEL = 0;
+    const PSR0_LEVEL = 1;
+    const PSR1_LEVEL = 3;
+    const PSR2_LEVEL = 7;
+    const SYMFONY_LEVEL = 15;
+    const CONTRIB_LEVEL = 32;
+
     /**
      * @var FileList
      */
     protected $files;
 
     /**
-     * @var string|null
+     * @var int|null
      */
-    protected $binFile;
+    protected $level;
 
     /**
-     * @var string|null
+     * @var string[]|null
      */
-    protected $configFile;
+    protected $fixers;
 
     /**
      * @var bool
@@ -32,16 +40,16 @@ class PhpCsFixer extends ActionAbstract
     /**
      * Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
      *
-     * @param FileList    $files            The files to check
-     * @param string|null $binFile          (Optional, default is from vendor) File path to PHP-CS-Fixer binary
-     * @param string|null $configFile       (Optional, default is project root) File path to PHP-CS-Fixer config
-     * @param bool        $addAutomatically (Optional, default is true) Whether to add modified files to commit or not
+     * @param FileList      $files            The files to check
+     * @param int|null      $level            (Optional, defaults to NONE_LEVEL) Fixer level to use
+     * @param string[]|null $fixers           (Optional, defaults to null) Set the fixers to use
+     * @param bool          $addAutomatically (Optional, default is true) Whether to add modified files to commit or not
      */
-    public function __construct(FileList $files, $binFile = null, $configFile = null, $addAutomatically = true)
+    public function __construct(FileList $files, $level = self::NONE_LEVEL, $fixers = null, $addAutomatically = true)
     {
         $this->files = $files;
-        $this->binFile = $binFile ?: $this->getBinFile();
-        $this->configFile = $configFile;
+        $this->level = $level;
+        $this->fixers = $fixers;
         $this->addAutomatically = $addAutomatically;
     }
 
@@ -58,12 +66,9 @@ class PhpCsFixer extends ActionAbstract
      */
     public function isSupported()
     {
-        if (!file_exists($this->binFile)) {
+        if (!class_exists('\Symfony\CS\Fixer')) {
             $this->logger->warning(
-                sprintf(
-                    'PHP-CS-Fixer could not be found in: %s',
-                    $this->binFile
-                )
+                'PHP-CS-Fixer could not be loaded: class \Symfony\CS\Fixer not found.'
             );
 
             return false;
@@ -77,65 +82,59 @@ class PhpCsFixer extends ActionAbstract
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $files = $this->files->toArray();
+        $fixer = $this->getCsFixer();
+        $fixers = $this->resolveFixers($fixer, $this->level, $this->fixers);
+        $cache = new \Symfony\CS\FileCacheManager(false, getcwd(), $fixers);
 
-        $progress = $this->createProgressBar($input, $output, count($files));
+        $progress = $this->createProgressBar($input, $output, $this->files->count());
         $progress->start();
 
-        $failed = [];
+        /** @var SfyFileInfo $file */
+        foreach ($this->files->getSourceIterator() as $file) {
+            $progress->setMessage('Processing ' . $file->getRelativePathname() . '...');
 
-        foreach ($files as $file) {
-            $progress->setMessage('Processing ' . $file . '...');
-
-            $process = new Process(
-                sprintf(
-                    'php -f %s -- fix %s %s',
-                    escapeshellarg($this->binFile),
-                    escapeshellarg($file),
-                    $this->configFile ? ('--config-file=' . escapeshellarg($this->configFile)) : ''
-                )
-            );
-            $process->run();
-
-            switch ($process->getExitCode()) {
-                case 0:
-                    // file has been changed
-                    if ($this->addAutomatically) {
-                        exec('git add ' . escapeshellarg($file));
-                    }
-                    break;
-                case 1:
-                    // file not changed
-                    break;
-                default:
-                    // some sort of error
-                    $failed[$file] = explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput()));
-                    break;
+            if ($fixer->fixFile($file, $fixers, false, false, $cache) && $this->addAutomatically) {
+                $process = new Process('git add ' . escapeshellarg($file->getRelativePathname()));
+                $process->mustRun();
             }
 
             $progress->advance();
-        }
-
-        if (count($failed)) {
-            $message = 'PhpCsFixer failed for the following file(s):';
-            foreach ($failed as $file => $result) {
-                $message .= PHP_EOL . '- ' . $file . ':';
-                $message .= PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $result);
-            }
-            throw new \RuntimeException($message);
         }
 
         $progress->finish();
     }
 
     /**
-     * @return string
+     * @return \Symfony\CS\Fixer
      */
-    protected function getBinFile()
+    private function getCsFixer()
     {
-        return PROJECT_ROOT . 'vendor'
-            . DIRECTORY_SEPARATOR . 'friendsofphp'
-            . DIRECTORY_SEPARATOR . 'php-cs-fixer'
-            . DIRECTORY_SEPARATOR . 'php-cs-fixer';
+        $fixer = new \Symfony\CS\Fixer();
+        $fixer->registerBuiltInFixers();
+        $fixer->registerBuiltInConfigs();
+
+        return $fixer;
+    }
+
+    /**
+     * @param \Symfony\CS\Fixer $fixer
+     * @param int               $level
+     * @param string[]          $fixers
+     *
+     * @return \Symfony\CS\FixerInterface[]
+     */
+    private function resolveFixers($fixer, $level, $fixers)
+    {
+        $resolver = new \Symfony\CS\ConfigurationResolver();
+        $resolver
+            ->setAllFixers($fixer->getFixers())
+            ->setConfig(
+                \Symfony\CS\Config\Config::create()
+                    ->level($level)
+                    ->fixers($fixers)
+            )
+            ->resolve();
+
+        return $resolver->getFixers();
     }
 }

@@ -84,4 +84,4 @@ file_put_contents(
     )
 );
 
-echo 'Done.' .PHP_EOL;
+echo 'Done.' . PHP_EOL;

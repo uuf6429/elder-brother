@@ -307,7 +307,7 @@ class FileList implements \IteratorAggregate, \Countable
     /**
      * @return \Iterator
      */
-    protected function getSourceIterator()
+    public function getSourceIterator()
     {
         if (!$this->sourceResult) {
             $source = $this->source;

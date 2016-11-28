@@ -28,6 +28,7 @@ This tools makes it easy to set up these tasks, as well as putting such policies
     - [Execute External Program (ExecuteProgram)](#execute-external-program-executeprogram)
     - [Disallow Files (ForbiddenFiles)](#disallow-files-forbiddenfiles)
     - [PHP Code Style Fixer (PhpCsFixer)](#php-code-style-fixer-phpcsfixer)
+    - [PHP Code Style Fixer (PhpCsFixerOld)](#php-code-style-fixer-phpcsfixerold)
     - [PHP Syntax Check (PhpLinter)](#php-syntax-check-phplinter)
     - [Show Warning For Files (RiskyFiles)](#show-warning-for-files-riskyfiles)
   - [FAQ](#faq)
@@ -126,6 +127,18 @@ Will stop process if `$files` is not empty, for the reason specified in `$reason
 
 ```php
 new PhpCsFixer(
+    \FileList $files, // The files to check
+    int|null $level, // (Optional, defaults to NONE_LEVEL) Fixer level to use
+    string[]|null $fixers, // (Optional, defaults to null) Set the fixers to use
+    bool $addAutomatically // (Optional, default is true) Whether to add modified files to commit or not
+)
+```
+Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
+
+### [PHP Code Style Fixer (PhpCsFixerOld)](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/PhpCsFixerOld.php)
+
+```php
+new PhpCsFixerOld(
     \FileList $files, // The files to check
     string|null $binFile, // (Optional, default is from vendor) File path to PHP-CS-Fixer binary
     string|null $configFile, // (Optional, default is project root) File path to PHP-CS-Fixer config
