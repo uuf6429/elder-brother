@@ -48,8 +48,13 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
                 );
 
                 // replace platform-specific text with general text
-                $aliases = ['Parse error:', 'Fatal error: Uncaught Error:', 'Fatal error:'];
-                $message = str_replace($aliases, '????:', $message);
+                $aliases = [
+                    'PHP Parse error:  ',
+                    'Parse error: ',
+                    'Fatal error: Uncaught Error: ',
+                    'Fatal error: ',
+                ];
+                $message = str_replace($aliases, '????: ', $message);
 
                 // do some asserting :)
                 $this->assertSame(get_class($expectedException), get_class($ex));
@@ -109,7 +114,7 @@ class PhpLinterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Input\InputInterface
+     * @return Input\InputInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getInputMock()
     {

@@ -69,7 +69,7 @@ class PhpLinter extends ActionAbstract
 
             if ($process->run() !== 0) {
                 $failed[$file] = array_filter(
-                    explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput())),
+                    explode("\n", str_replace(PHP_EOL, "\n", $process->getErrorOutput() ?: $process->getOutput())),
                     function ($line) {
                         return strlen($line)
                             && substr($line, 0, 15) !== 'Errors parsing ';

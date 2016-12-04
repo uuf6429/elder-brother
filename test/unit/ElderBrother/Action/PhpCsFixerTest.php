@@ -31,7 +31,7 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-            $action = new PhpCsFixer($fileList, PhpCsFixer::SYMFONY_LEVEL, ['linefeed'], false, false);
+            $action = new PhpCsFixer($fileList, PhpCsFixer::SYMFONY_LEVEL, ['linefeed'], false);
 
             try {
                 $action->execute($this->getInputMock(), $this->getOutputMock());
@@ -119,7 +119,7 @@ class PhpCsFixerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Input\InputInterface
+     * @return Input\InputInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getInputMock()
     {

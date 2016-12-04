@@ -2,10 +2,16 @@
 
 namespace uuf6429\ElderBrother\Vcs\Adapter;
 
+use Symfony\Component\Process\Process;
 use uuf6429\ElderBrother\Event\Git as GitEvent;
 
 class Git extends Adapter
 {
+    /**
+     * @var string|null
+     */
+    protected $hookPath;
+
     /**
      * {@inheritdoc}
      */
@@ -35,11 +41,13 @@ class Git extends Adapter
         foreach ($hookFiles as $event => $file) {
             // back up existing hook
             if (file_exists($file)) {
-                rename($file, $file . '.bak');
+                if (!rename($file, $file . '.bak')) {
+                    throw new \RuntimeException("Could not back up hook file: $file");
+                }
             }
 
             // create new hook file
-            file_put_contents(
+            if (!file_put_contents(
                 $file,
                 sprintf(
                     '#!/bin/sh%sphp -f %s -- run -e %s%s',
@@ -48,8 +56,12 @@ class Git extends Adapter
                     escapeshellarg($event),
                     PHP_EOL
                 )
-            );
-            chmod($file, 0755);
+            )) {
+                throw new \RuntimeException("Could not create hook file: $file");
+            }
+            if (!chmod($file, 0755)) {
+                throw new \RuntimeException("Could not make hook file executable: $file");
+            }
         }
     }
 
@@ -62,12 +74,15 @@ class Git extends Adapter
 
         foreach ($hookFiles as $file) {
             // remove hook file
-            unlink($file);
+            if (!unlink($file)) {
+                throw new \RuntimeException("Could not remove hook file: $file");
+            }
 
             // restore backed up hook
             if (file_exists($file . '.bak')) {
-                rename($file . '.bak', $file);
-                chmod($file, 0755);
+                if (!rename($file . '.bak', $file) || !chmod($file, 0755)) {
+                    throw new \RuntimeException("Could not properly restore hook file: $file");
+                }
             }
         }
 
@@ -80,9 +95,25 @@ class Git extends Adapter
      */
     protected function getHookPath()
     {
-        return PROJECT_ROOT
-            . '.git' . DIRECTORY_SEPARATOR
-            . 'hooks' . DIRECTORY_SEPARATOR;
+        if (!$this->hookPath) {
+            $process = new Process('git rev-parse --git-dir', PROJECT_ROOT);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                $this->logger->warning(
+                    sprintf(
+                        "Failed to retrieve git project root:\n$ %s (exit: %d)\n> %s",
+                        $process->getCommandLine(),
+                        $process->getExitCode(),
+                        implode("\n> ", explode(PHP_EOL, $process->getOutput()))
+                    )
+                );
+            } else {
+                $this->hookPath = realpath(trim($process->getOutput())) . '/hooks/';
+            }
+        }
+
+        return $this->hookPath;
     }
 
     /**

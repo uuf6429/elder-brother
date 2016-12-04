@@ -129,7 +129,7 @@ Will stop process if `$files` is not empty, for the reason specified in `$reason
 new PhpCsFixer(
     \FileList $files, // The files to check
     int|null $level, // (Optional, defaults to NONE_LEVEL) Fixer level to use
-    string[]|null $fixers, // (Optional, defaults to null) Set the fixers to use
+    string[] $fixers, // (Optional, defaults to null) Set the fixers to use
     bool $addAutomatically // (Optional, default is true) Whether to add modified files to commit or not
 )
 ```

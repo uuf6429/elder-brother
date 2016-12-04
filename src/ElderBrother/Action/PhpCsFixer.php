@@ -28,7 +28,7 @@ class PhpCsFixer extends ActionAbstract
     protected $level;
 
     /**
-     * @var string[]|null
+     * @var string[]
      */
     protected $fixers;
 
@@ -40,12 +40,12 @@ class PhpCsFixer extends ActionAbstract
     /**
      * Runs all the provided files through PHP-CS-Fixer, fixing any code style issues.
      *
-     * @param FileList      $files            The files to check
-     * @param int|null      $level            (Optional, defaults to NONE_LEVEL) Fixer level to use
-     * @param string[]|null $fixers           (Optional, defaults to null) Set the fixers to use
-     * @param bool          $addAutomatically (Optional, default is true) Whether to add modified files to commit or not
+     * @param FileList $files            The files to check
+     * @param int|null $level            (Optional, defaults to NONE_LEVEL) Fixer level to use
+     * @param string[] $fixers           (Optional, defaults to null) Set the fixers to use
+     * @param bool     $addAutomatically (Optional, default is true) Whether to add modified files to commit or not
      */
-    public function __construct(FileList $files, $level = self::NONE_LEVEL, $fixers = null, $addAutomatically = true)
+    public function __construct(FileList $files, $level = self::NONE_LEVEL, $fixers = [], $addAutomatically = true)
     {
         $this->files = $files;
         $this->level = $level;

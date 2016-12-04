@@ -21,16 +21,22 @@ class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
             }
         );
 
-        $action->setConfig(
-            $this->getMockBuilder(ConfigInterface::class)
-                ->disableOriginalConstructor()
-                ->getMock()
-        );
+        $action->setConfig($this->getConfigMock());
 
         $this->setExpectedException(\RuntimeException::class, 'Testing');
 
         $action->execute(new Input\StringInput(''), new Output\NullOutput());
 
         $this->assertSame('Do something (ExecuteCode)', $action->getName());
+    }
+
+    /**
+     * @return ConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getConfigMock()
+    {
+        return $this->getMockBuilder(ConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

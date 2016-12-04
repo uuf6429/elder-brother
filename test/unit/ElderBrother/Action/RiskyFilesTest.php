@@ -71,7 +71,7 @@ class RiskyFilesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Input\InputInterface
+     * @return Input\InputInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getInputMock()
     {
@@ -80,7 +80,7 @@ class RiskyFilesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Output\OutputInterface
+     * @return Output\OutputInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getOutputMock()
     {

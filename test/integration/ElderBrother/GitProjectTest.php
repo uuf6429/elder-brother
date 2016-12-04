@@ -15,7 +15,7 @@ class GitProjectTest extends BaseProjectTest
             'Create fake "old" hook.'
         );
 
-        $this->assertCommandSuccessful(self::getEbCmd() . 'install');
+        $this->assertCommandSuccessful(self::getEbCmd() . 'install --no-ansi', ['']);
 
         $this->assertTrue(
             file_exists('.git/hooks/pre-commit'),

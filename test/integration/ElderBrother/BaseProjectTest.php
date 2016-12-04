@@ -76,15 +76,14 @@ abstract class BaseProjectTest extends \PHPUnit_Framework_TestCase
         $process->run();
 
         $actualResult = $process->getExitCode();
-        $actualOutput = explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput()));
+        $actualOutput = explode("\n", str_replace(PHP_EOL, "\n", $process->getOutput() ?: $process->getErrorOutput()));
 
         if (!$message) {
-            $sep = PHP_EOL . '- ';
             $message = sprintf(
-                'Command:%sResult (exit: %s):%s',
-                $sep . $command . PHP_EOL,
+                "Command:\n$ %s\nResult (exit: %d):\n> %s",
+                $command,
                 $process->getExitCode(),
-                $sep . implode($sep, $actualOutput)
+                implode("\n> ", $actualOutput)
             );
         }
 
