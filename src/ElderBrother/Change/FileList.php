@@ -29,6 +29,8 @@ class FileList implements \IteratorAggregate, \Countable
         $this->source = $source;
     }
 
+    //region File / Path Name filtering
+
     /**
      * Search file names (excluding path) by pattern.
      *
@@ -113,6 +115,10 @@ class FileList implements \IteratorAggregate, \Countable
         );
     }
 
+    //endregion
+
+    //region FS Item Type Filtering
+
     /**
      * Filters out anything that is not a file.
      *
@@ -148,6 +154,8 @@ class FileList implements \IteratorAggregate, \Countable
             }
         );
     }
+
+    //endregion
 
     /**
      * Filters out items that do not match the specified level.
@@ -265,8 +273,24 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function filter(\Closure $closure)
     {
+        return $this->filterByClosure(
+            __FUNCTION__ . '(' . spl_object_hash($closure) . ')',
+            $closure
+        );
+    }
+
+    /**
+     * Helper method that can be reused in more specific methods.
+     *
+     * @param string   $subKey  The cache sub key to use
+     * @param \Closure $closure The filtering callback
+     *
+     * @return FileList
+     */
+    protected function filterByClosure($subKey, \Closure $closure)
+    {
         return new self(
-            $this->cacheKey . '->' . __FUNCTION__ . '(' . spl_object_hash($closure) . ')',
+            $this->cacheKey . '->' . $subKey,
             function () use ($closure) {
                 return new Iterator\CustomFilterIterator(
                     $this->getSourceIterator(),
@@ -275,6 +299,201 @@ class FileList implements \IteratorAggregate, \Countable
             }
         );
     }
+
+    //region SQL filtering
+
+    protected static $sqlDCLKeywords = [
+        'GRANT',
+        'REVOKE',
+    ];
+
+    protected static $sqlDDLKeywords = [
+        'CREATE',
+        'ALTER',
+        'DROP',
+        'TRUNCATE',
+        'COMMENT',
+        'RENAME',
+    ];
+
+    protected static $sqlDMLKeywords = [
+        'INSERT',
+        'UPDATE',
+        'DELETE',
+        'MERGE',
+        'CALL',
+        'EXPLAIN PLAN',
+        'LOCK TABLE',
+    ];
+
+    protected static $sqlDQLKeywords = [
+        'SELECT',
+        'SHOW',
+    ];
+
+    protected static $sqlTCLKeywords = [
+        'COMMIT',
+        'ROLLBACK',
+        'SAVEPOINT',
+        'SET TRANSACTION',
+    ];
+
+    /**
+     * Helper function to check type of sql statements.
+     *
+     * @param string[] $keywords The keywords to look for
+     * @param bool     $filterIn True to "filter in", false to "filter out"
+     *
+     * @return FileList
+     */
+    protected function sqlKeywords($keywords, $filterIn)
+    {
+        return $this->filterByClosure(
+            __FUNCTION__ . '(' . is_null($keywords) ? '*' : implode(',', $keywords) . ')',
+            function (FileInfo $file) use ($keywords, $filterIn) {
+                if (!($sql = $file->getParsedSql())) {
+                    return !$filterIn;
+                }
+
+                // TODO Investigate if this code breaks for sub-statements.
+                foreach ($keywords as $keyword) {
+                    if (array_key_exists($keyword, $sql)) {
+                        return $filterIn;
+                    }
+                }
+
+                return !$filterIn;
+            }
+        );
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithDCL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDCLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, true);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithoutDCL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDCLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, false);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithDDL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDDLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, true);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithoutDDL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDDLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, false);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithDML($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDMLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, true);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithoutDML($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDMLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, false);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithDQL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDQLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, true);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithoutDQL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlDQLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, false);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithTCL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlTCLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, true);
+    }
+
+    /**
+     * @param string[]|null $keywords
+     *
+     * @return FileList
+     */
+    public function sqlWithoutTCL($keywords = null)
+    {
+        $keywords = is_null($keywords) ? static::$sqlTCLKeywords : array_map('strtoupper', $keywords);
+
+        return $this->sqlKeywords($keywords, false);
+    }
+
+    // TODO sqlTable()
+    // TODO sqlNotTable()
+    // TODO sqlFilter()
+
+    //endregion
+
+    //region Iterator / Interface implementations
 
     /**
      * Returns array of file paths.
@@ -346,4 +565,6 @@ class FileList implements \IteratorAggregate, \Countable
     {
         return count($this->toArray());
     }
+
+    //endregion
 }

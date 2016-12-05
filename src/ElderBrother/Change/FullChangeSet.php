@@ -2,8 +2,6 @@
 
 namespace uuf6429\ElderBrother\Change;
 
-use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
-
 class FullChangeSet
 {
     /**

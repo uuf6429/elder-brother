@@ -6,10 +6,10 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use uuf6429\ElderBrother\Config\Config;
-use uuf6429\ElderBrother\Console\Command;
 use uuf6429\ElderBrother\Action;
 use uuf6429\ElderBrother\Change;
+use uuf6429\ElderBrother\Config\Config;
+use uuf6429\ElderBrother\Console\Command;
 
 class RunTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +41,7 @@ class RunTest extends \PHPUnit_Framework_TestCase
                             return [new Change\FileInfo($testFile, dirname($testFile), basename($testFile))];
                         }
                     )
-                )
+                ),
             ]
         );
 
@@ -67,7 +67,7 @@ class RunTest extends \PHPUnit_Framework_TestCase
                             return [new Change\FileInfo($testFile, dirname($testFile), basename($testFile))];
                         }
                     )
-                )
+                ),
             ]
         );
 
@@ -79,6 +79,7 @@ class RunTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Action\ActionAbstract[] $actions
+     *
      * @return Command\Run
      */
     protected function getRunCommand($actions)
@@ -90,6 +91,7 @@ class RunTest extends \PHPUnit_Framework_TestCase
         $cmd->setConfig($cfg);
         $cmd->setLogger($log);
         $cmd->setApplication(new Application());
+
         return $cmd;
     }
 

@@ -14,7 +14,7 @@ interface ConfigInterface
     public function loadFromFile($fileName, LoggerInterface $logger);
 
     /**
-     * @param array $array
+     * @param array           $array
      * @param LoggerInterface $logger
      */
     public function loadFromArray($array, LoggerInterface $logger);
