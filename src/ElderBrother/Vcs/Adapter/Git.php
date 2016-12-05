@@ -10,7 +10,7 @@ class Git extends Adapter
     /**
      * @var string|null
      */
-    protected $hookPath;
+    protected $gitDir;
 
     /**
      * {@inheritdoc}
@@ -52,7 +52,7 @@ class Git extends Adapter
                 sprintf(
                     '#!/bin/sh%sphp -f %s -- run -e %s%s',
                     PHP_EOL,
-                    escapeshellarg(str_replace(PROJECT_ROOT, '', ELDER_BROTHER_BIN)),
+                    escapeshellarg(str_replace($this->getGitDir(), '', ELDER_BROTHER_BIN)),
                     escapeshellarg($event),
                     PHP_EOL
                 )
@@ -93,9 +93,9 @@ class Git extends Adapter
     /**
      * @return string
      */
-    protected function getHookPath()
+    protected function getGitDir()
     {
-        if (!$this->hookPath) {
+        if (!$this->gitDir) {
             $process = new Process('git rev-parse --git-dir', PROJECT_ROOT);
             $process->run();
 
@@ -109,11 +109,19 @@ class Git extends Adapter
                     )
                 );
             } else {
-                $this->hookPath = realpath(trim($process->getOutput())) . '/hooks/';
+                $this->gitDir = realpath(trim($process->getOutput())) . '/';
             }
         }
 
-        return $this->hookPath;
+        return $this->gitDir;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getHookPath()
+    {
+        return $this->getGitDir() . 'hooks/';
     }
 
     /**
