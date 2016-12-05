@@ -4,7 +4,6 @@ namespace uuf6429\ElderBrother\Change;
 
 use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Iterator;
-use Symfony\Component\Finder\SplFileInfo as SfyFileInfo;
 
 class FileList implements \IteratorAggregate, \Countable
 {
@@ -22,7 +21,7 @@ class FileList implements \IteratorAggregate, \Countable
 
     /**
      * @param string   $cacheKey Unique key to identify this collection of files
-     * @param callable $source   Callable that return an iterator or array of SplFileInfo
+     * @param callable $source   Callable that return an iterator or array of FileInfo
      */
     public function __construct($cacheKey, callable $source)
     {
@@ -187,7 +186,7 @@ class FileList implements \IteratorAggregate, \Countable
         }
 
         return $this->filter(
-            function (SfyFileInfo $file) use ($minDepth, $maxDepth) {
+            function (FileInfo $file) use ($minDepth, $maxDepth) {
                 $depth = count(explode('/', str_replace('\\', '/', $file->getRelativePathname()))) - 1;
 
                 return $depth >= $minDepth && $depth <= $maxDepth;
@@ -258,7 +257,7 @@ class FileList implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Filters using an anonymous function. Function receives a \SplFileInfo and must return false to filter it out.
+     * Filters using an anonymous function. Function receives a Change\FileInfo and must return false to filter it out.
      *
      * @param \Closure $closure An anonymous function
      *
@@ -286,7 +285,7 @@ class FileList implements \IteratorAggregate, \Countable
     {
         if (!isset(self::$cache[$this->cacheKey])) {
             self::$cache[$this->cacheKey] = array_map(
-                function (\SplFileInfo $file) {
+                function (FileInfo $file) {
                     return $file->getPathname();
                 },
                 array_values(iterator_to_array($this->getSourceIterator()))
@@ -321,9 +320,9 @@ class FileList implements \IteratorAggregate, \Countable
                 $iterator = new \ArrayIterator();
                 foreach ($result as $file) {
                     $iterator->append(
-                        $file instanceof \SplFileInfo
+                        $file instanceof FileInfo
                             ? $file
-                            : new SfyFileInfo($file, getcwd(), $file)
+                            : new FileInfo($file, getcwd(), $file)
                     );
                 }
                 $this->sourceResult = $iterator;

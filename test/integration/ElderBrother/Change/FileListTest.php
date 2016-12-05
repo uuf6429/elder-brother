@@ -183,7 +183,7 @@ class FileListTest extends BaseProjectTest
                 '$itemsProvider' => function () {
                     return Change\FullChangeSet::get()
                         ->filter(
-                            function (\SplFileInfo $file) {
+                            function (Change\FileInfo $file) {
                                 return in_array($file->getFilename(), ['README', 'LICENSE', 'CONTRIBUTE']);
                             }
                         )

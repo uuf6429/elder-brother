@@ -4,9 +4,9 @@ namespace uuf6429\ElderBrother\Action;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\SplFileInfo as SfyFileInfo;
 use Symfony\Component\Process\Process;
 use uuf6429\ElderBrother\Change\FileList;
+use uuf6429\ElderBrother\Change\FileInfo;
 
 class PhpCsFixer extends ActionAbstract
 {
@@ -93,7 +93,7 @@ class PhpCsFixer extends ActionAbstract
         $progress = $this->createProgressBar($input, $output);
         $progress->start($this->files->count());
 
-        /** @var SfyFileInfo $file */
+        /** @var FileInfo $file */
         foreach ($this->files->getSourceIterator() as $file) {
             $progress->setMessage('Checking <info>' . $file->getRelativePathname() . '</info>...');
 

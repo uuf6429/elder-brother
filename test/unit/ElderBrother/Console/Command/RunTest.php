@@ -10,7 +10,6 @@ use uuf6429\ElderBrother\Config\Config;
 use uuf6429\ElderBrother\Console\Command;
 use uuf6429\ElderBrother\Action;
 use uuf6429\ElderBrother\Change;
-use Symfony\Component\Finder\SplFileInfo as SfyFileInfo;
 
 class RunTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,7 +38,7 @@ class RunTest extends \PHPUnit_Framework_TestCase
                     new Change\FileList(
                         'good-code-test',
                         function () use ($testFile) {
-                            return [new SfyFileInfo($testFile, dirname($testFile), basename($testFile))];
+                            return [new Change\FileInfo($testFile, dirname($testFile), basename($testFile))];
                         }
                     )
                 )
@@ -65,7 +64,7 @@ class RunTest extends \PHPUnit_Framework_TestCase
                     new Change\FileList(
                         'bad-code-test',
                         function () use ($testFile) {
-                            return [new SfyFileInfo($testFile, dirname($testFile), basename($testFile))];
+                            return [new Change\FileInfo($testFile, dirname($testFile), basename($testFile))];
                         }
                     )
                 )
