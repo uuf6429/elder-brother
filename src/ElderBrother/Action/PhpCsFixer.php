@@ -86,7 +86,7 @@ class PhpCsFixer extends ActionAbstract
         $fixers = $this->resolveFixers($fixer, $this->level, $this->fixers);
         $cache = new \Symfony\CS\FileCacheManager(false, getcwd(), $fixers);
 
-        if(!$this->files->count()){
+        if (!$this->files->count()) {
             return;
         }
 

@@ -81,7 +81,7 @@ class Run extends CommandAbstract
                 $output->write("\033[1A");
                 $progress->setMessage('Finished.');
                 $progress->finish();
-                $output->writeln(['','']);
+                $output->writeln(['', '']);
             }
             $output->writeln('Done.');
         }

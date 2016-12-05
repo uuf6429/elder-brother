@@ -79,7 +79,7 @@ class PhpCsFixerOld extends ActionAbstract
     {
         $files = $this->files->toArray();
 
-        if(empty($files)){
+        if (empty($files)) {
             return;
         }
 
