@@ -52,7 +52,7 @@ class Git extends Adapter
                 sprintf(
                     '#!/bin/sh%sphp -f %s -- run -e %s%s',
                     PHP_EOL,
-                    escapeshellarg(ELDER_BROTHER_BIN),
+                    escapeshellarg(str_replace(PROJECT_ROOT, '', ELDER_BROTHER_BIN)),
                     escapeshellarg($event),
                     PHP_EOL
                 )

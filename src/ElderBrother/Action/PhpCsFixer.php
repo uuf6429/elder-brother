@@ -42,7 +42,7 @@ class PhpCsFixer extends ActionAbstract
      *
      * @param FileList $files            The files to check
      * @param int|null $level            (Optional, defaults to NONE_LEVEL) Fixer level to use
-     * @param string[] $fixers           (Optional, defaults to null) Set the fixers to use
+     * @param string[] $fixers           (Optional, default is empty) Set the fixers to use
      * @param bool     $addAutomatically (Optional, default is true) Whether to add modified files to commit or not
      */
     public function __construct(FileList $files, $level = self::NONE_LEVEL, $fixers = [], $addAutomatically = true)
@@ -86,12 +86,16 @@ class PhpCsFixer extends ActionAbstract
         $fixers = $this->resolveFixers($fixer, $this->level, $this->fixers);
         $cache = new \Symfony\CS\FileCacheManager(false, getcwd(), $fixers);
 
-        $progress = $this->createProgressBar($input, $output, $this->files->count());
-        $progress->start();
+        if(!$this->files->count()){
+            return;
+        }
+
+        $progress = $this->createProgressBar($input, $output);
+        $progress->start($this->files->count());
 
         /** @var SfyFileInfo $file */
         foreach ($this->files->getSourceIterator() as $file) {
-            $progress->setMessage('Processing ' . $file->getRelativePathname() . '...');
+            $progress->setMessage('Checking <info>' . $file->getRelativePathname() . '</info>...');
 
             if ($fixer->fixFile($file, $fixers, false, false, $cache) && $this->addAutomatically) {
                 $process = new Process('git add ' . escapeshellarg($file->getRelativePathname()));
@@ -101,6 +105,7 @@ class PhpCsFixer extends ActionAbstract
             $progress->advance();
         }
 
+        $progress->setMessage('Finished.');
         $progress->finish();
     }
 

@@ -43,18 +43,18 @@ abstract class ActionAbstract implements Config\ConfigAwareInterface, Log\Logger
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param int             $steps
      *
      * @return ProgressBar
      */
-    protected function createProgressBar(InputInterface $input, OutputInterface $output, $steps)
+    protected function createProgressBar(InputInterface $input, OutputInterface $output)
     {
-        if ($input->hasOption('no-progress')) {
+        if ($input->hasParameterOption('no-progress')) {
             $output = new NullOutput();
         }
 
-        $progress = new ProgressBar($output, $steps);
-        $progress->setFormat(' %current%/%max% [%bar%] %percent:3s%% %memory:6s% %message%');
+        $progress = new ProgressBar($output);
+        $progress->setMessage('');
+        $progress->setFormat(' %current%/%max% [%bar%] %percent:3s%% %message%');
         $progress->setRedrawFrequency(1);
 
         return $progress;

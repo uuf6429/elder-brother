@@ -79,13 +79,17 @@ class PhpCsFixerOld extends ActionAbstract
     {
         $files = $this->files->toArray();
 
-        $progress = $this->createProgressBar($input, $output, count($files));
-        $progress->start();
+        if(empty($files)){
+            return;
+        }
+
+        $progress = $this->createProgressBar($input, $output);
+        $progress->start(count($files));
 
         $failed = [];
 
         foreach ($files as $file) {
-            $progress->setMessage('Processing ' . $file . '...');
+            $progress->setMessage('Checking <info>' . $file . '</info>...');
 
             $process = new Process(
                 sprintf(
@@ -125,6 +129,7 @@ class PhpCsFixerOld extends ActionAbstract
             throw new \RuntimeException($message);
         }
 
+        $progress->setMessage('Finished.');
         $progress->finish();
     }
 

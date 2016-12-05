@@ -2,6 +2,8 @@
 
 namespace uuf6429\ElderBrother\Change;
 
+use Symfony\Component\Process\Process;
+
 class GitChangeSet
 {
     /**
@@ -74,20 +76,23 @@ class GitChangeSet
         return new FileList(
             __METHOD__ . '(' . $filter . ')',
             function () use (&$filter) {
-                $output = [];
                 $command = 'git diff --cached --name-status';
+
                 if ($filter) {
                     $command .= ' --diff-filter=' . escapeshellarg($filter);
                 }
 
-                exec($command, $output);
+                $process = new Process($command);
+                $process->mustRun();
 
-                return array_unique(
-                    array_map(
-                        function ($line) {
-                            return trim(substr($line, 1));
-                        },
-                        $output
+                return array_filter(
+                        array_unique(
+                        array_map(
+                            function ($line) {
+                                return trim(substr($line, 1));
+                            },
+                            explode("\n", $process->getOutput())
+                        )
                     )
                 );
             }

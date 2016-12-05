@@ -48,18 +48,19 @@ class Run extends CommandAbstract
 
         if (!empty($actions)) {
             // See https://github.com/symfony/symfony/pull/10356 for multiple bars
-            $progress = !$input->hasOption('no-progress')
-                ? new ProgressBar($output, count($actions))
-                : null;
+            $progress = $input->hasParameterOption('no-progress')
+                ? null : new ProgressBar($output);
             if ($progress) {
-                $progress->start();
+                $progress->setFormat(' %current%/%max% [%bar%] %percent:3s%% %message%');
+                $progress->setMessage('');
+                $progress->start(count($actions));
                 $output->write("\n");
             }
 
             foreach ($actions as $action) {
                 if ($progress) {
                     $output->write("\033[1A");
-                    $progress->setMessage('Running "' . $action->getName() . '".');
+                    $progress->setMessage('Running <info>"' . $action->getName() . '"</info>.');
                     $progress->advance();
                     $output->write("\n");
                 } else {
@@ -77,7 +78,10 @@ class Run extends CommandAbstract
             }
 
             if ($progress) {
+                $output->write("\033[1A");
+                $progress->setMessage('Finished.');
                 $progress->finish();
+                $output->writeln(['','']);
             }
             $output->writeln('Done.');
         }
