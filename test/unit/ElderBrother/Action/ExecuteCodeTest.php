@@ -20,14 +20,13 @@ class ExecuteCodeTest extends \PHPUnit_Framework_TestCase
                 throw new \RuntimeException('Testing');
             }
         );
-
         $action->setConfig($this->getConfigMock());
 
-        $this->setExpectedException(\RuntimeException::class, 'Testing');
-
-        $action->execute(new Input\StringInput(''), new Output\NullOutput());
-
+        $this->assertTrue($action->isSupported());
         $this->assertSame('Do something (ExecuteCode)', $action->getName());
+
+        $this->setExpectedException(\RuntimeException::class, 'Testing');
+        $action->execute(new Input\StringInput(''), new Output\NullOutput());
     }
 
     /**

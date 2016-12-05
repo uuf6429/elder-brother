@@ -159,6 +159,19 @@ class FileListTest extends BaseProjectTest
                         ->toArray();
                 },
             ],
+            'files without ext' => [
+                '$expectedItems' => [
+                    'CONTRIBUTE',
+                    'LICENSE',
+                    'README',
+                ],
+                '$itemsProvider' => function () {
+                    return Change\FullChangeSet::get()
+                        ->files()
+                        ->notName('*.*')
+                        ->toArray();
+                },
+            ],
 
             // tests for custom filter
             'filter for some files' => [

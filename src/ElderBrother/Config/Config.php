@@ -19,19 +19,24 @@ class Config implements ConfigInterface
     public function loadFromFile($fileName, LoggerInterface $logger)
     {
         $eventActions = include $fileName;
+        $this->loadFromArray($eventActions, $logger);
+    }
 
-        $this->initActions($eventActions, $logger);
-
-        foreach ($eventActions as $event => $prioritizedActions) {
-            // merge config
-            $this->config[$event] = array_merge(
-                isset($this->config[$event]) ? $this->config[$event] : [],
-                $prioritizedActions
-            );
-
-            // reorder actions
-            ksort($this->config[$event]);
+    /**
+     * {@inheritdoc}
+     */
+    public function loadFromArray($array, LoggerInterface $logger)
+    {
+        // merge config and set up actions
+        foreach ($array as $event => $prioritizedActions) {
+            foreach ($prioritizedActions as $key => $action) {
+                $this->setUpAction($action, $logger);
+                $this->config[$event][$key] = $action;
+            }
         }
+
+        // reorder actions by index
+        array_map('ksort', $this->config);
     }
 
     /**
@@ -63,20 +68,17 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @param array<string,ActionAbstract[]> $eventActions
-     * @param LoggerInterface                $logger
+     * @param ActionAbstract  $action
+     * @param LoggerInterface $logger
      */
-    private function initActions(&$eventActions, LoggerInterface $logger)
+    private function setUpAction(ActionAbstract $action, LoggerInterface $logger)
     {
-        foreach ($eventActions as $actionList) {
-            foreach ($actionList as $action) {
-                if ($action instanceof ConfigAwareInterface) {
-                    $action->setConfig($this);
-                }
-                if ($action instanceof LoggerAwareInterface) {
-                    $action->setLogger($logger);
-                }
-            }
+        if ($action instanceof ConfigAwareInterface) {
+            $action->setConfig($this);
+        }
+
+        if ($action instanceof LoggerAwareInterface) {
+            $action->setLogger($logger);
         }
     }
 }

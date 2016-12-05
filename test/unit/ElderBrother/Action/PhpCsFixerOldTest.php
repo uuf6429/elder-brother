@@ -48,6 +48,7 @@ class PhpCsFixerOldTest extends \PHPUnit_Framework_TestCase
             $action = new PhpCsFixerOld($fileList, $binFile, $configFile, false);
 
             try {
+                $this->assertTrue($action->isSupported());
                 $action->execute($this->getInputMock(), $this->getOutputMock());
 
                 if (!is_null($expectedFileContents)) {
