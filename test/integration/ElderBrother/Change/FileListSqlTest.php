@@ -1,9 +1,10 @@
 <?php
 
-namespace uuf6429\ElderBrother\Action;
+namespace uuf6429\ElderBrother\Change;
 
+use SqlParser\Statements\TransactionStatement;
 use uuf6429\ElderBrother\BaseProjectTest;
-use uuf6429\ElderBrother\Change;
+use SqlParser\Statements\InsertStatement;
 
 class FileListSqlTest extends BaseProjectTest
 {
@@ -12,11 +13,20 @@ class FileListSqlTest extends BaseProjectTest
         parent::setUpBeforeClass();
 
         /** @noinspection SqlResolve */
+        /** @noinspection SqlNoDataSourceInspection */
         foreach (
             [
                 'src/Acme/Combinator.php' => '<?php namespace Acme; class Combinator {}',
                 'src/Acme/Comparator.php' => '<?php namespace Acme; class Comparator {}',
                 'README' => 'Please read me!',
+                'sql/AA-000-init.sql' => <<<'SQL'
+                    SET NAMES utf8;
+                    SET TIME_ZONE='+00:00';
+                    SET character set 'utf8';
+                    DROP DATABASE IF EXISTS world;
+                    CREATE DATABASE world;
+SQL
+                ,
                 'sql/EB-000-schema.sql' => <<<'SQL'
                     CREATE TABLE `City` (
                       `ID` int(11) NOT NULL,
@@ -43,6 +53,42 @@ SQL
                 'sql/EB-002-keys-and-fix.sql' => <<<SQL
                     ALTER TABLE `City` ADD PRIMARY KEY (`ID`);
                     UPDATE `City` SET `Name` = "کندهار‎" WHERE `ID` = 2;
+SQL
+                ,
+                'sql/EB-003-more-data.sql' => <<<'SQL'
+                    INSERT INTO `City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES
+                    (10,'Tilburg','NLD','Noord-Brabant',193238),
+                    (11,'Groningen','NLD','Groningen',172701),
+                    (12,'Breda','NLD','Noord-Brabant',160398),
+                    (13,'Apeldoorn','NLD','Gelderland',153491);
+SQL
+                ,
+                'sql/EB-004-much-more-data.sql' => <<<'SQL'
+                    BEGIN;
+                    INSERT INTO `City` (`ID`, `Name`, `CountryCode`, `District`, `Population`) VALUES
+                    (14,'Nijmegen','NLD','Gelderland',152463),
+                    (15,'Enschede','NLD','Overijssel',149544),
+                    (16,'Haarlem','NLD','Noord-Holland',148772),
+                    (17,'Almere','NLD','Flevoland',142465),
+                    (18,'Arnhem','NLD','Gelderland',138020),
+                    (19,'Zaanstad','NLD','Noord-Holland',135621),
+                    (20,'´s-Hertogenbosch','NLD','Noord-Brabant',129170),
+                    (21,'Amersfoort','NLD','Utrecht',126270),
+                    (22,'Maastricht','NLD','Limburg',122087),
+                    (23,'Dordrecht','NLD','Zuid-Holland',119811),
+                    (24,'Leiden','NLD','Zuid-Holland',117196),
+                    (25,'Haarlemmermeer','NLD','Noord-Holland',110722),
+                    (26,'Zoetermeer','NLD','Zuid-Holland',110214),
+                    (27,'Emmen','NLD','Drenthe',105853),
+                    (28,'Zwolle','NLD','Overijssel',105819),
+                    (29,'Ede','NLD','Gelderland',101574),
+                    (30,'Delft','NLD','Zuid-Holland',95268),
+                    (31,'Heerlen','NLD','Limburg',95052),
+                    (32,'Alkmaar','NLD','Noord-Holland',92713),
+                    (33,'Willemstad','ANT','Curaçao',2345),
+                    (34,'Tirana','ALB','Tirana',270000),
+                    (35,'Alger','DZA','Alger',2168000);
+                    COMMIT;
 SQL
                 ,
             ] as $filename => $content
@@ -81,17 +127,31 @@ SQL
     public function fileListQueryDataProvider()
     {
         return [
-            'sql with pattern' => [
+            'sql that inserts more then 5 records' => [
                 '$expectedItems' => [
-                    'sql/EB-000-schema.sql',
-                    'sql/EB-002-keys-and-fix.sql',
+                    'sql/EB-001-data.sql',
+                    'sql/EB-004-much-more-data.sql',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->filter(
-                        function (Change\FileInfo $file) {
-                            print_r($file->getParsedSql()); // NOTE: Instead of UPDATE we get SET... why?
+                    return FullChangeSet::get()->filter(
+                        function (FileInfo $file) {
+                            $checkStatements = function ($checkStatements, $statements) {
+                                foreach ($statements as $statement) {
+                                    if ($statement instanceof TransactionStatement) {
+                                        if ($checkStatements($checkStatements, $statement->statements)) {
+                                            return true;
+                                        }
+                                    } elseif ($statement instanceof InsertStatement) {
+                                        if (count($statement->values) > 5) {
+                                            return true;
+                                        }
+                                    }
+                                }
 
-                            return false;
+                                return false;
+                            };
+
+                            return $checkStatements($checkStatements, $file->getSqlParser()->statements);
                         }
                     )->toArray();
                 },
@@ -103,7 +163,7 @@ SQL
                     'sql/EB-002-keys-and-fix.sql',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->sqlWithDDL()->toArray();
+                    return FullChangeSet::get()->sqlWithDDL()->toArray();
                 },
             ],
             'sql with ddl and dml' => [
@@ -111,7 +171,23 @@ SQL
                     'sql/EB-002-keys-and-fix.sql',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->sqlWithDDL()->sqlWithDML()->toArray();
+                    return FullChangeSet::get()->sqlWithDDL()->sqlWithDML()->toArray();
+                },
+            ],
+            'sql without ddl and dml' => [
+                '$expectedItems' => [
+                    'sql/EB-002-keys-and-fix.sql',
+                ],
+                '$itemsProvider' => function () {
+                    return FullChangeSet::get()->sqlWithoutDDL()->sqlWithoutDML()->toArray();
+                },
+            ],
+            'sql with tcl' => [
+                '$expectedItems' => [
+                    'sql/EB-004-much-more-data.sql'
+                ],
+                '$itemsProvider' => function () {
+                    return FullChangeSet::get()->sqlWithTCL()->toArray();
                 },
             ],
         ];

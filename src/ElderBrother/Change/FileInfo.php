@@ -2,28 +2,23 @@
 
 namespace uuf6429\ElderBrother\Change;
 
-use PHPSQLParser\PHPSQLParser;
+use SqlParser\Parser as SqlParser;
 use Symfony\Component\Finder;
 
 class FileInfo extends Finder\SplFileInfo
 {
-    /** @var array|false */
-    protected $parsedSql;
+    /** @var SqlParser */
+    protected $sqlParser;
 
     /**
-     * @return array
+     * @return SqlParser
      */
-    public function getParsedSql()
+    public function getSqlParser()
     {
-        if ($this->parsedSql === null) {
-            if ($this->isFile()) {
-                $parser = new PHPSQLParser($this->getContents());
-                $this->parsedSql = $parser->parsed;
-            } else {
-                $this->parsedSql = false;
-            }
+        if ($this->sqlParser === null) {
+            $this->sqlParser = new SqlParser($this->isFile() ? $this->getContents() : null);
         }
 
-        return $this->parsedSql;
+        return $this->sqlParser;
     }
 }

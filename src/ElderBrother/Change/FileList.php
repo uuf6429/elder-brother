@@ -4,6 +4,8 @@ namespace uuf6429\ElderBrother\Change;
 
 use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Iterator;
+use SqlParser\Parser as SqlParser;
+use SqlParser\Statements;
 
 class FileList implements \IteratorAggregate, \Countable
 {
@@ -302,93 +304,92 @@ class FileList implements \IteratorAggregate, \Countable
 
     //region SQL filtering
 
-    protected static $sqlDCLKeywords = [
-        'GRANT',
-        'REVOKE',
-    ];
-
-    protected static $sqlDDLKeywords = [
-        'CREATE',
-        'ALTER',
-        'DROP',
-        'TRUNCATE',
-        'COMMENT',
-        'RENAME',
-    ];
-
-    protected static $sqlDMLKeywords = [
-        'INSERT',
-        'UPDATE',
-        'DELETE',
-        'MERGE',
-        'CALL',
-        'EXPLAIN PLAN',
-        'LOCK TABLE',
-    ];
-
-    protected static $sqlDQLKeywords = [
-        'SELECT',
-        'SHOW',
-    ];
-
-    protected static $sqlTCLKeywords = [
-        'COMMIT',
-        'ROLLBACK',
-        'SAVEPOINT',
-        'SET TRANSACTION',
+    protected static $statementTypes = [
+        'util' => [
+            Statements\ExplainStatement::class,
+            Statements\AnalyzeStatement::class,
+            Statements\BackupStatement::class,
+            Statements\CheckStatement::class,
+            Statements\ChecksumStatement::class,
+            Statements\OptimizeStatement::class,
+            Statements\RepairStatement::class,
+            Statements\RestoreStatement::class,
+            Statements\SetStatement::class,
+            Statements\ShowStatement::class,
+        ],
+        'ddl' => [
+            Statements\AlterStatement::class,
+            Statements\CreateStatement::class,
+            Statements\DropStatement::class,
+            Statements\RenameStatement::class,
+            Statements\TruncateStatement::class,
+        ],
+        'dml' => [
+            Statements\CallStatement::class,
+            Statements\DeleteStatement::class,
+            Statements\InsertStatement::class,
+            Statements\ReplaceStatement::class,
+            Statements\SelectStatement::class,
+            Statements\UpdateStatement::class,
+        ],
+        'tcl' => [
+            Statements\TransactionStatement::class,
+        ],
     ];
 
     /**
-     * Helper function to check type of sql statements.
+     * Helper function to check if sql code has any of the specified statements.
      *
-     * @param string[] $keywords The keywords to look for
-     * @param bool     $filterIn True to "filter in", false to "filter out"
+     * @param string[] $statementClasses The statement classes to look for
+     * @param bool     $filterIn         True to "filter in", false to "filter out"
      *
      * @return FileList
      */
-    protected function sqlKeywords($keywords, $filterIn)
+    protected function sqlHasStatements($statementClasses, $filterIn)
     {
         return $this->filterByClosure(
-            __FUNCTION__ . '(' . is_null($keywords) ? '*' : implode(',', $keywords) . ')',
-            function (FileInfo $file) use ($keywords, $filterIn) {
-                if (!($sql = $file->getParsedSql())) {
-                    return !$filterIn;
-                }
-
-                // TODO Investigate if this code breaks for sub-statements.
-                foreach ($keywords as $keyword) {
-                    if (array_key_exists($keyword, $sql)) {
-                        return $filterIn;
-                    }
-                }
-
-                return !$filterIn;
+            __FUNCTION__ . '(' . implode(',', $statementClasses) . ')',
+            function (FileInfo $file) use ($statementClasses, $filterIn) {
+                return $this->sqlSearchStatementsForTypes($file->getSqlParser()->statements, $statementClasses)
+                    ? $filterIn : !$filterIn;
             }
         );
     }
 
     /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
+     * @param \SqlParser\Statement[] $statements
+     * @param string[] $classes
+     * @return boolean
      */
-    public function sqlWithDCL($keywords = null)
+    protected function sqlSearchStatementsForTypes($statements, $classes)
     {
-        $keywords = is_null($keywords) ? static::$sqlDCLKeywords : array_map('strtoupper', $keywords);
+        foreach ($statements as $statement) {
+            foreach ($classes as $class) {
+                if ($statement instanceof $class) {
+                    return true;
+                }
+            }
 
-        return $this->sqlKeywords($keywords, true);
+            if ($statement instanceof Statements\TransactionStatement) {
+                if ($this->sqlSearchStatementsForTypes($statement->statements, $classes)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
+     * @param string[] $keywords
+     * @return string[]
      */
-    public function sqlWithoutDCL($keywords = null)
+    protected function sqlKeywordsToClasses($keywords)
     {
-        $keywords = is_null($keywords) ? static::$sqlDCLKeywords : array_map('strtoupper', $keywords);
+        $keywords = array_map('strtoupper', $keywords);
+        $statements = array_replace(array_flip($keywords), SqlParser::$STATEMENT_PARSERS);
 
-        return $this->sqlKeywords($keywords, false);
+        return array_filter(array_unique($statements));
     }
 
     /**
@@ -398,9 +399,11 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function sqlWithDDL($keywords = null)
     {
-        $keywords = is_null($keywords) ? static::$sqlDDLKeywords : array_map('strtoupper', $keywords);
+        $classes = is_null($keywords)
+            ? static::$statementTypes['ddl']
+            : $this->sqlKeywordsToClasses($keywords);
 
-        return $this->sqlKeywords($keywords, true);
+        return $this->sqlHasStatements($classes, true);
     }
 
     /**
@@ -410,9 +413,11 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function sqlWithoutDDL($keywords = null)
     {
-        $keywords = is_null($keywords) ? static::$sqlDDLKeywords : array_map('strtoupper', $keywords);
+        $classes = is_null($keywords)
+            ? static::$statementTypes['ddl']
+            : $this->sqlKeywordsToClasses($keywords);
 
-        return $this->sqlKeywords($keywords, false);
+        return $this->sqlHasStatements($classes, false);
     }
 
     /**
@@ -422,9 +427,11 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function sqlWithDML($keywords = null)
     {
-        $keywords = is_null($keywords) ? static::$sqlDMLKeywords : array_map('strtoupper', $keywords);
+        $classes = is_null($keywords)
+            ? static::$statementTypes['dml']
+            : $this->sqlKeywordsToClasses($keywords);
 
-        return $this->sqlKeywords($keywords, true);
+        return $this->sqlHasStatements($classes, true);
     }
 
     /**
@@ -434,33 +441,11 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function sqlWithoutDML($keywords = null)
     {
-        $keywords = is_null($keywords) ? static::$sqlDMLKeywords : array_map('strtoupper', $keywords);
+        $classes = is_null($keywords)
+            ? static::$statementTypes['dml']
+            : $this->sqlKeywordsToClasses($keywords);
 
-        return $this->sqlKeywords($keywords, false);
-    }
-
-    /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
-     */
-    public function sqlWithDQL($keywords = null)
-    {
-        $keywords = is_null($keywords) ? static::$sqlDQLKeywords : array_map('strtoupper', $keywords);
-
-        return $this->sqlKeywords($keywords, true);
-    }
-
-    /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
-     */
-    public function sqlWithoutDQL($keywords = null)
-    {
-        $keywords = is_null($keywords) ? static::$sqlDQLKeywords : array_map('strtoupper', $keywords);
-
-        return $this->sqlKeywords($keywords, false);
+        return $this->sqlHasStatements($classes, false);
     }
 
     /**
@@ -470,9 +455,11 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function sqlWithTCL($keywords = null)
     {
-        $keywords = is_null($keywords) ? static::$sqlTCLKeywords : array_map('strtoupper', $keywords);
+        $classes = is_null($keywords)
+            ? static::$statementTypes['tcl']
+            : $this->sqlKeywordsToClasses($keywords);
 
-        return $this->sqlKeywords($keywords, true);
+        return $this->sqlHasStatements($classes, true);
     }
 
     /**
@@ -482,9 +469,11 @@ class FileList implements \IteratorAggregate, \Countable
      */
     public function sqlWithoutTCL($keywords = null)
     {
-        $keywords = is_null($keywords) ? static::$sqlTCLKeywords : array_map('strtoupper', $keywords);
+        $classes = is_null($keywords)
+            ? static::$statementTypes['tcl']
+            : $this->sqlKeywordsToClasses($keywords);
 
-        return $this->sqlKeywords($keywords, false);
+        return $this->sqlHasStatements($classes, false);
     }
 
     // TODO sqlTable()

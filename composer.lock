@@ -4,113 +4,61 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b855478777d0d714c2fce7725c88d70e",
-    "content-hash": "fd0a8ae3978a252ecd846d665c037930",
+    "hash": "fd7c4c0bcac7b3758f978ebd0e3724d9",
+    "content-hash": "d5b21e258ca065731e8e04cbc368de9b",
     "packages": [
         {
-            "name": "analog/analog",
-            "version": "1.0.8-stable",
+            "name": "phpmyadmin/sql-parser",
+            "version": "v3.4.14",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jbroadway/analog.git",
-                "reference": "9e02358735912ed203c073d192b5e07cb6b663dd"
+                "url": "https://github.com/phpmyadmin/sql-parser.git",
+                "reference": "7078697d6dde394cdfec16e0e7e8c4194f50149a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jbroadway/analog/zipball/9e02358735912ed203c073d192b5e07cb6b663dd",
-                "reference": "9e02358735912ed203c073d192b5e07cb6b663dd",
+                "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/7078697d6dde394cdfec16e0e7e8c4194f50149a",
+                "reference": "7078697d6dde394cdfec16e0e7e8c4194f50149a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
-                "psr/log": "1.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Analog": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Johnny Broadway",
-                    "email": "johnny@johnnybroadway.com",
-                    "homepage": "http://www.johnnybroadway.com/"
-                }
-            ],
-            "description": "PHP 5.3+ micro logging class that can be extended via closures. Includes several pre-built handlers including file, mail, syslog, HTTP post, and MongoDB.",
-            "homepage": "https://github.com/jbroadway/analog",
-            "keywords": [
-                "alerts",
-                "debug",
-                "debugging",
-                "error",
-                "log",
-                "logger",
-                "logging",
-                "syslog"
-            ],
-            "time": "2016-08-10 22:15:10"
-        },
-        {
-            "name": "greenlion/php-sql-parser",
-            "version": "v4.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/greenlion/PHP-SQL-Parser.git",
-                "reference": "45227af0f6ed2c094cefdbc5b921889605c0c1ff"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/greenlion/PHP-SQL-Parser/zipball/45227af0f6ed2c094cefdbc5b921889605c0c1ff",
-                "reference": "45227af0f6ed2c094cefdbc5b921889605c0c1ff",
-                "shasum": ""
-            },
-            "require": {
-                "analog/analog": "^1.0.6",
-                "php": ">=5.3.2"
+                "ext-mbstring": "*",
+                "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.0.14",
-                "squizlabs/php_codesniffer": "^1.5.1"
+                "phpunit/php-code-coverage": "~2.0 || ~3.0",
+                "phpunit/phpunit": "~4.8 || ~5.1"
             },
+            "bin": [
+                "bin/highlight-query",
+                "bin/lint-query"
+            ],
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "PHPSQLParser\\": "src/"
+                "psr-4": {
+                    "SqlParser\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause"
+                "GPL-2.0+"
             ],
             "authors": [
                 {
-                    "name": "André Rothe",
-                    "email": "phosco@gmx.de",
-                    "homepage": "https://www.phosco.info",
-                    "role": "Committer"
-                },
-                {
-                    "name": "Justin Swanhart",
-                    "email": "greenlion@gmail.com",
-                    "homepage": "http://code.google.com/u/greenlion@gmail.com/",
-                    "role": "Owner"
+                    "name": "The phpMyAdmin Team",
+                    "email": "developers@phpmyadmin.net",
+                    "homepage": "https://www.phpmyadmin.net/team/"
                 }
             ],
-            "description": "A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL",
-            "homepage": "https://github.com/greenlion/PHP-SQL-Parser",
+            "description": "A validating SQL lexer and parser with a focus on MySQL dialect.",
+            "homepage": "https://github.com/phpmyadmin/sql-parser",
             "keywords": [
-                "creator",
-                "mysql",
+                "analysis",
+                "lexer",
                 "parser",
                 "sql"
             ],
-            "time": "2016-10-12 04:29:55"
+            "time": "2016-11-30 10:49:56"
         },
         {
             "name": "psr/log",
@@ -906,16 +854,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.30",
+            "version": "4.8.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "a534e04d0bd39c557c2881c341efd06fa6f1292a"
+                "reference": "98b2b39a520766bec663ff5b7ff1b729db9dbfe3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a534e04d0bd39c557c2881c341efd06fa6f1292a",
-                "reference": "a534e04d0bd39c557c2881c341efd06fa6f1292a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/98b2b39a520766bec663ff5b7ff1b729db9dbfe3",
+                "reference": "98b2b39a520766bec663ff5b7ff1b729db9dbfe3",
                 "shasum": ""
             },
             "require": {
@@ -974,7 +922,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-12-01 17:05:48"
+            "time": "2016-12-09 02:45:31"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

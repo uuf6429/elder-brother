@@ -1,9 +1,8 @@
 <?php
 
-namespace uuf6429\ElderBrother\Action;
+namespace uuf6429\ElderBrother\Change;
 
 use uuf6429\ElderBrother\BaseProjectTest;
-use uuf6429\ElderBrother\Change;
 
 class FileListTest extends BaseProjectTest
 {
@@ -70,7 +69,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme/data.dml',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->files()->toArray();
+                    return FullChangeSet::get()->files()->toArray();
                 },
             ],
             'directories' => [
@@ -81,7 +80,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->directories()->toArray();
+                    return FullChangeSet::get()->directories()->toArray();
                 },
             ],
 
@@ -93,7 +92,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme/AcmeTest.php',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->name('*.php')->toArray();
+                    return FullChangeSet::get()->name('*.php')->toArray();
                 },
             ],
             'all items in src (3 files + 1 dir)' => [
@@ -104,7 +103,7 @@ class FileListTest extends BaseProjectTest
                     'src/Acme/config.yml',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->path('src/')->toArray();
+                    return FullChangeSet::get()->path('src/')->toArray();
                 },
             ],
             'all items with Acme in their pathname' => [
@@ -113,7 +112,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->name('Acme')->toArray();
+                    return FullChangeSet::get()->name('Acme')->toArray();
                 },
             ],
             'all php files not in src/' => [
@@ -121,7 +120,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme/AcmeTest.php',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->notPath('src/')->name('*.php')->toArray();
+                    return FullChangeSet::get()->notPath('src/')->name('*.php')->toArray();
                 },
             ],
 
@@ -133,7 +132,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme/AcmeTest.php',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->contains('class')->toArray();
+                    return FullChangeSet::get()->contains('class')->toArray();
                 },
             ],
             'base classes' => [
@@ -142,7 +141,7 @@ class FileListTest extends BaseProjectTest
                     'src/Acme/Comparator.php',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()
+                    return FullChangeSet::get()
                         ->name('*.php')
                         ->notContains('/extends\\s+([\\w_\\\\]+)\\s*\\{/')
                         ->toArray();
@@ -153,7 +152,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme/AcmeTest.php',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()
+                    return FullChangeSet::get()
                         ->name('*.php')
                         ->contains('/class\\s+([\\w_]+)\\s+extends\\s\\\\?PHPUnit_Framework_TestCase\\s*{/')
                         ->toArray();
@@ -166,7 +165,7 @@ class FileListTest extends BaseProjectTest
                     'README',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()
+                    return FullChangeSet::get()
                         ->files()
                         ->notName('*.*')
                         ->toArray();
@@ -181,9 +180,9 @@ class FileListTest extends BaseProjectTest
                     'README',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()
+                    return FullChangeSet::get()
                         ->filter(
-                            function (Change\FileInfo $file) {
+                            function (FileInfo $file) {
                                 return in_array($file->getFilename(), ['README', 'LICENSE', 'CONTRIBUTE']);
                             }
                         )
@@ -199,7 +198,7 @@ class FileListTest extends BaseProjectTest
                     'README',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->files()->depth('< 2')->toArray();
+                    return FullChangeSet::get()->files()->depth('< 2')->toArray();
                 },
             ],
             'top level directories' => [
@@ -210,7 +209,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->directories()->depth('< 2')->toArray();
+                    return FullChangeSet::get()->directories()->depth('< 2')->toArray();
                 },
             ],
             'deep items' => [
@@ -222,7 +221,7 @@ class FileListTest extends BaseProjectTest
                     'test/Acme/data.dml',
                 ],
                 '$itemsProvider' => function () {
-                    return Change\FullChangeSet::get()->depth('> 1')->toArray();
+                    return FullChangeSet::get()->depth('> 1')->toArray();
                 },
             ],
         ];
