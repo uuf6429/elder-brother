@@ -23,11 +23,12 @@ class FileListSqlSupportTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $class
      * @param string $property
+     *
      * @return mixed
      */
     protected function getProtectedStaticPropertyValue($class, $property)
     {
-        $refClass   = new \ReflectionClass($class);
+        $refClass = new \ReflectionClass($class);
         $refProperty = $refClass->getProperty($property);
         $refProperty->setAccessible(true);
         $value = $refProperty->getValue();

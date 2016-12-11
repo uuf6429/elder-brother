@@ -2,9 +2,9 @@
 
 namespace uuf6429\ElderBrother\Change;
 
-use SqlParser\Statements\TransactionStatement;
-use uuf6429\ElderBrother\BaseProjectTest;
+use SqlParser\Statement;
 use SqlParser\Statements\InsertStatement;
+use uuf6429\ElderBrother\BaseProjectTest;
 
 class FileListSqlTest extends BaseProjectTest
 {
@@ -12,8 +12,8 @@ class FileListSqlTest extends BaseProjectTest
     {
         parent::setUpBeforeClass();
 
-        /** @noinspection SqlResolve */
-        /** @noinspection SqlNoDataSourceInspection */
+        /* @noinspection SqlResolve */
+        /* @noinspection SqlNoDataSourceInspection */
         foreach (
             [
                 'src/Acme/Combinator.php' => '<?php namespace Acme; class Combinator {}',
@@ -50,7 +50,7 @@ SQL
                     (9, 'Eindhoven', 'NLD', 'Noord-Brabant', 201843);
 SQL
                 ,
-                'sql/EB-002-keys-and-fix.sql' => <<<SQL
+                'sql/EB-002-keys-and-fix.sql' => <<<'SQL'
                     ALTER TABLE `City` ADD PRIMARY KEY (`ID`);
                     UPDATE `City` SET `Name` = "کندهار‎" WHERE `ID` = 2;
 SQL
@@ -133,26 +133,12 @@ SQL
                     'sql/EB-004-much-more-data.sql',
                 ],
                 '$itemsProvider' => function () {
-                    return FullChangeSet::get()->filter(
-                        function (FileInfo $file) {
-                            $checkStatements = function ($checkStatements, $statements) {
-                                foreach ($statements as $statement) {
-                                    if ($statement instanceof TransactionStatement) {
-                                        if ($checkStatements($checkStatements, $statement->statements)) {
-                                            return true;
-                                        }
-                                    } elseif ($statement instanceof InsertStatement) {
-                                        if (count($statement->values) > 5) {
-                                            return true;
-                                        }
-                                    }
-                                }
-
-                                return false;
-                            };
-
-                            return $checkStatements($checkStatements, $file->getSqlParser()->statements);
-                        }
+                    return FullChangeSet::get()->sqlStatementFilter(
+                        function (Statement $statement) {
+                            return ($statement instanceof InsertStatement)
+                                && (count($statement->values) > 5);
+                        },
+                        true
                     )->toArray();
                 },
             ],
@@ -184,7 +170,7 @@ SQL
             ],
             'sql with tcl' => [
                 '$expectedItems' => [
-                    'sql/EB-004-much-more-data.sql'
+                    'sql/EB-004-much-more-data.sql',
                 ],
                 '$itemsProvider' => function () {
                     return FullChangeSet::get()->sqlWithTCL()->toArray();

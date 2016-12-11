@@ -2,10 +2,11 @@
 
 namespace uuf6429\ElderBrother\Change;
 
-use Symfony\Component\Finder\Comparator;
-use Symfony\Component\Finder\Iterator;
 use SqlParser\Parser as SqlParser;
+use SqlParser\Statement;
 use SqlParser\Statements;
+use Symfony\Component\Finder\Comparator as SfyComparator;
+use Symfony\Component\Finder\Iterator as SfyIterator;
 
 class FileList implements \IteratorAggregate, \Countable
 {
@@ -45,7 +46,7 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $pattern . ')',
             function () use ($pattern) {
-                return new Iterator\FilenameFilterIterator(
+                return new SfyIterator\FilenameFilterIterator(
                     $this->getSourceIterator(),
                     [$pattern],
                     []
@@ -66,7 +67,7 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $pattern . ')',
             function () use ($pattern) {
-                return new Iterator\FilenameFilterIterator(
+                return new SfyIterator\FilenameFilterIterator(
                     $this->getSourceIterator(),
                     [],
                     [$pattern]
@@ -87,7 +88,7 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $pattern . ')',
             function () use ($pattern) {
-                return new Iterator\PathFilterIterator(
+                return new SfyIterator\PathFilterIterator(
                     $this->getSourceIterator(),
                     [$pattern],
                     []
@@ -108,7 +109,7 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $pattern . ')',
             function () use ($pattern) {
-                return new Iterator\PathFilterIterator(
+                return new SfyIterator\PathFilterIterator(
                     $this->getSourceIterator(),
                     [],
                     [$pattern]
@@ -131,9 +132,9 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '()',
             function () {
-                return new Iterator\FileTypeFilterIterator(
+                return new SfyIterator\FileTypeFilterIterator(
                     $this->getSourceIterator(),
-                    Iterator\FileTypeFilterIterator::ONLY_FILES
+                    SfyIterator\FileTypeFilterIterator::ONLY_FILES
                 );
             }
         );
@@ -149,9 +150,9 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '()',
             function () {
-                return new Iterator\FileTypeFilterIterator(
+                return new SfyIterator\FileTypeFilterIterator(
                     $this->getSourceIterator(),
-                    Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES
+                    SfyIterator\FileTypeFilterIterator::ONLY_DIRECTORIES
                 );
             }
         );
@@ -170,7 +171,7 @@ class FileList implements \IteratorAggregate, \Countable
     {
         $minDepth = 0;
         $maxDepth = PHP_INT_MAX;
-        $comparator = new Comparator\NumberComparator($level);
+        $comparator = new SfyComparator\NumberComparator($level);
         $comparatorTarget = intval($comparator->getTarget());
 
         switch ($comparator->getOperator()) {
@@ -216,9 +217,9 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $date . ')',
             function () use ($date) {
-                return new Iterator\DateRangeFilterIterator(
+                return new SfyIterator\DateRangeFilterIterator(
                     $this->getSourceIterator(),
-                    [new Comparator\DateComparator($date)]
+                    [new SfyComparator\DateComparator($date)]
                 );
             }
         );
@@ -236,7 +237,7 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $pattern . ')',
             function () use ($pattern) {
-                return new Iterator\FilecontentFilterIterator(
+                return new SfyIterator\FilecontentFilterIterator(
                     $this->getSourceIterator(),
                     [$pattern],
                     []
@@ -257,7 +258,7 @@ class FileList implements \IteratorAggregate, \Countable
         return new self(
             $this->cacheKey . '->' . __FUNCTION__ . '(' . $pattern . ')',
             function () use ($pattern) {
-                return new Iterator\FilecontentFilterIterator(
+                return new SfyIterator\FilecontentFilterIterator(
                     $this->getSourceIterator(),
                     [],
                     [$pattern]
@@ -269,35 +270,23 @@ class FileList implements \IteratorAggregate, \Countable
     /**
      * Filters using an anonymous function. Function receives a Change\FileInfo and must return false to filter it out.
      *
-     * @param \Closure $closure An anonymous function
+     * @param \Closure    $closure An anonymous function
+     * @param string|null $subKey  Internal use only!
      *
      * @return static
      */
-    public function filter(\Closure $closure)
+    public function filter(\Closure $closure, $subKey = null)
     {
-        return $this->filterByClosure(
-            __FUNCTION__ . '(' . spl_object_hash($closure) . ')',
-            $closure
+        $subKey = $subKey ? $subKey : sprintf(
+            '%s(%s)',
+            __FUNCTION__,
+            spl_object_hash($closure)
         );
-    }
 
-    /**
-     * Helper method that can be reused in more specific methods.
-     *
-     * @param string   $subKey  The cache sub key to use
-     * @param \Closure $closure The filtering callback
-     *
-     * @return FileList
-     */
-    protected function filterByClosure($subKey, \Closure $closure)
-    {
         return new self(
             $this->cacheKey . '->' . $subKey,
             function () use ($closure) {
-                return new Iterator\CustomFilterIterator(
-                    $this->getSourceIterator(),
-                    [$closure]
-                );
+                return new Iterator\CustomFilterIterator($this->getSourceIterator(), $closure);
             }
         );
     }
@@ -338,6 +327,35 @@ class FileList implements \IteratorAggregate, \Countable
     ];
 
     /**
+     * @param \Closure    $closure   The closure to call for every parsed statement. It will receive two parameters and must return a bool:
+     *                               function(\SqlParser\Statement $statement, \uuf6429\ElderBrother\Change\FileInfo $file): boolean
+     * @param bool        $recursive Whether closure should be called for all statements and sub-statements or not
+     * @param string|null $subKey    Internal use only!
+     *
+     * @return FileList
+     */
+    public function sqlStatementFilter(\Closure $closure, $recursive = false, $subKey = null)
+    {
+        $subKey = $subKey ? $subKey : sprintf(
+            '%s(%s,%s)',
+            __FUNCTION__,
+            spl_object_hash($closure),
+            var_export($recursive, true)
+        );
+
+        return new self(
+            $this->cacheKey . '->' . $subKey,
+            function () use ($closure, $recursive) {
+                return new Iterator\SqlStatementFilterIterator(
+                    $this->getSourceIterator(),
+                    $closure,
+                    $recursive
+                );
+            }
+        );
+    }
+
+    /**
      * Helper function to check if sql code has any of the specified statements.
      *
      * @param string[] $statementClasses The statement classes to look for
@@ -347,41 +365,24 @@ class FileList implements \IteratorAggregate, \Countable
      */
     protected function sqlHasStatements($statementClasses, $filterIn)
     {
-        return $this->filterByClosure(
-            __FUNCTION__ . '(' . implode(',', $statementClasses) . ')',
-            function (FileInfo $file) use ($statementClasses, $filterIn) {
-                return $this->sqlSearchStatementsForTypes($file->getSqlParser()->statements, $statementClasses)
-                    ? $filterIn : !$filterIn;
-            }
+        return $this->sqlStatementFilter(
+            function (Statement $statement) use ($statementClasses, $filterIn) {
+                foreach ($statementClasses as $class) {
+                    if ($statement instanceof $class) {
+                        return $filterIn;
+                    }
+                }
+
+                return !$filterIn;
+            },
+            true,
+            __FUNCTION__ . '(' . implode(',', $statementClasses) . ')'
         );
     }
 
     /**
-     * @param \SqlParser\Statement[] $statements
-     * @param string[] $classes
-     * @return boolean
-     */
-    protected function sqlSearchStatementsForTypes($statements, $classes)
-    {
-        foreach ($statements as $statement) {
-            foreach ($classes as $class) {
-                if ($statement instanceof $class) {
-                    return true;
-                }
-            }
-
-            if ($statement instanceof Statements\TransactionStatement) {
-                if ($this->sqlSearchStatementsForTypes($statement->statements, $classes)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @param string[] $keywords
+     *
      * @return string[]
      */
     protected function sqlKeywordsToClasses($keywords)

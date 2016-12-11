@@ -1,14 +1,13 @@
 <?php
 
-namespace uuf6429\ElderBrother\Change;
+namespace uuf6429\ElderBrother\Change\Iterator;
 
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator as SfyRecursiveDirectoryIterator;
+use uuf6429\ElderBrother\Change\FileInfo;
 
 class RecursiveDirectoryIterator extends SfyRecursiveDirectoryIterator
 {
     /**
-     * Return an instance of SplFileInfo with support for relative paths.
-     *
      * @return FileInfo
      */
     public function current()

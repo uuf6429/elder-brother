@@ -17,9 +17,9 @@ class FullChangeSet
             __METHOD__ . '()',
             function () use ($dir) {
                 return new \RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator(
+                    new Iterator\RecursiveDirectoryIterator(
                         $dir,
-                        RecursiveDirectoryIterator::SKIP_DOTS
+                        Iterator\RecursiveDirectoryIterator::SKIP_DOTS
                     ),
                     \RecursiveIteratorIterator::CHILD_FIRST
                 );

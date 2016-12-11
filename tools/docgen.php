@@ -2,9 +2,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags;
 use phpDocumentor\Reflection\DocBlockFactory;
-use phpDocumentor\Reflection\DocBlock;
 use Symfony\Component\Debug;
 use uuf6429\ElderBrother\Action\ActionAbstract;
 
@@ -70,8 +70,8 @@ foreach (glob(__DIR__ . '/../src/ElderBrother/Action/*.php') as $file) {
         );
         $secActions[] = '';
         $secActions[] = "```php\n$signature\n```";
-        if($deprecated){
-            /** @var Tags\Deprecated $deprecated */
+        if ($deprecated) {
+            /* @var Tags\Deprecated $deprecated */
             $secActions[] = sprintf(
                 '_**Deprecated**_: %s.',
                 rtrim($deprecated->getDescription() ?: 'No description', '.')
