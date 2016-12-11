@@ -15,6 +15,9 @@ coverage:
     changes: false
     patch: true
     project: true
+  ignore:
+    - test/*
+    - tools/*
 parsers:
   gcov:
     branch_detection:

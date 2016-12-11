@@ -7,6 +7,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use uuf6429\ElderBrother\Change\FileList;
 
+/**
+ * @deprecated Use PhpCsFixer class instead
+ */
 class PhpCsFixerOld extends ActionAbstract
 {
     /**

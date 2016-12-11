@@ -2,10 +2,11 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use \phpDocumentor\Reflection\DocBlock\Tags\Param;
-use \phpDocumentor\Reflection\DocBlockFactory;
-use \Symfony\Component\Debug;
-use \uuf6429\ElderBrother\Action\ActionAbstract;
+use phpDocumentor\Reflection\DocBlock\Tags;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlock;
+use Symfony\Component\Debug;
+use uuf6429\ElderBrother\Action\ActionAbstract;
 
 Debug\ErrorHandler::register();
 Debug\ExceptionHandler::register();
@@ -23,14 +24,20 @@ foreach (glob(__DIR__ . '/../src/ElderBrother/Action/*.php') as $file) {
         if (!$reflector->isInstantiable()) {
             continue;
         }
+
+        $classDocBlock = $reflector->getDocComment() ? $docBlockFactory->create($reflector) : new DocBlock();
+        $deprecated = $classDocBlock->getTagsByName('deprecated');
+        $deprecated = count($deprecated) ? $deprecated[0] : null;
         $constructor = $reflector->getMethod('__construct');
-        $docBlock = $docBlockFactory->create($constructor);
+        $ctorDocBlock = $constructor->getDocComment() ? $docBlockFactory->create($constructor) : new DocBlock();
 
         /** @var ActionAbstract $object */
         $object = $reflector->newInstanceWithoutConstructor();
 
         $tocActions[] = sprintf(
-            '    - [%s](#%s)',
+            $deprecated
+                ? '    - [~~%s~~](#%s)'
+                : '    - [%s](#%s)',
             ucwords($object->getName()),
             str_replace(
                 [' ', '(', ')'],
@@ -38,10 +45,10 @@ foreach (glob(__DIR__ . '/../src/ElderBrother/Action/*.php') as $file) {
                 strtolower($object->getName())
             )
         );
-        $params = $docBlock->getTagsByName('param');
+        $params = $ctorDocBlock->getTagsByName('param');
         $signature = 'new ' . $reflector->getShortName() . '(';
         foreach ($params as $i => $param) {
-            /** @var Param $param */
+            /** @var Tags\Param $param */
             $isLast = $i == (count($params) - 1);
             $signature .= sprintf(
                 "\n    %s\$%s%s%s%s",
@@ -55,13 +62,23 @@ foreach (glob(__DIR__ . '/../src/ElderBrother/Action/*.php') as $file) {
         $signature .= ')';
 
         $secActions[] = sprintf(
-            '### [%s](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/%s.php)',
+            $deprecated
+                ? '### [~~%s~~](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/%s.php)'
+                : '### [%s](https://github.com/uuf6429/elder-brother/blob/master/src/ElderBrother/Action/%s.php)',
             ucwords($object->getName()),
             $reflector->getShortName()
         );
         $secActions[] = '';
         $secActions[] = "```php\n$signature\n```";
-        $secActions[] = trim($docBlock->getSummary()) ?: '*No Summary*';
+        if($deprecated){
+            /** @var Tags\Deprecated $deprecated */
+            $secActions[] = sprintf(
+                '_**Deprecated**_: %s.',
+                rtrim($deprecated->getDescription() ?: 'No description', '.')
+            );
+            $secActions[] = '';
+        }
+        $secActions[] = trim($ctorDocBlock->getSummary()) ?: '*No Summary*';
         $secActions[] = '';
     } catch (\Exception $ex) {
         echo $ex;

@@ -41,7 +41,11 @@ checks:
         avoid_fixme_comments: true
         duplication: false
 
-filter: {  }
+filter:
+    excluded_paths:
+        - test/
+        - tools/
+
 coding_style:
     php:
         spaces:
