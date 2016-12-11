@@ -76,7 +76,7 @@ class GitChangeSet
         return new FileList(
             __METHOD__ . '(' . $filter . ')',
             function () use (&$filter) {
-                $command = 'git diff --cached --name-status';
+                $command = 'git diff -z --cached --name-only';
 
                 if ($filter) {
                     $command .= ' --diff-filter=' . escapeshellarg($filter);
@@ -86,13 +86,8 @@ class GitChangeSet
                 $process->mustRun();
 
                 return array_filter(
-                        array_unique(
-                        array_map(
-                            function ($line) {
-                                return trim(substr($line, 1));
-                            },
-                            explode("\n", $process->getOutput())
-                        )
+                    array_unique(
+                        explode("\0", $process->getOutput())
                     )
                 );
             }
