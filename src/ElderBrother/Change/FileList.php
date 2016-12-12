@@ -387,92 +387,80 @@ class FileList implements \IteratorAggregate, \Countable
      */
     protected function sqlKeywordsToClasses($keywords)
     {
-        $keywords = array_map('strtoupper', $keywords);
-        $statements = array_replace(array_flip($keywords), SqlParser::$STATEMENT_PARSERS);
+        $keywords = array_flip(array_map('strtoupper', $keywords));
+        $statements = array_merge($keywords, array_intersect_key(SqlParser::$STATEMENT_PARSERS, $keywords));
 
         return array_filter(array_unique($statements));
     }
 
     /**
-     * @param string[]|null $keywords
+     * @return FileList
+     */
+    public function sqlWithDDL()
+    {
+        return $this->sqlHasStatements(static::$statementTypes['ddl'], true);
+    }
+
+    /**
+     * @return FileList
+     */
+    public function sqlWithoutDDL()
+    {
+        return $this->sqlHasStatements(static::$statementTypes['ddl'], false);
+    }
+
+    /**
+     * @return FileList
+     */
+    public function sqlWithDML()
+    {
+        return $this->sqlHasStatements(static::$statementTypes['dml'], true);
+    }
+
+    /**
+     * @return FileList
+     */
+    public function sqlWithoutDML()
+    {
+        return $this->sqlHasStatements(static::$statementTypes['dml'], false);
+    }
+
+    /**
+     * @return FileList
+     */
+    public function sqlWithTCL()
+    {
+        return $this->sqlHasStatements(static::$statementTypes['tcl'], true);
+    }
+
+    /**
+     * @return FileList
+     */
+    public function sqlWithoutTCL()
+    {
+        return $this->sqlHasStatements(static::$statementTypes['tcl'], false);
+    }
+
+    /**
+     * @param string[] $keywords Clause types (eg; SELECT, UPDATE...)
      *
      * @return FileList
      */
-    public function sqlWithDDL($keywords = null)
+    public function sqlWith($keywords)
     {
-        $classes = is_null($keywords)
-            ? static::$statementTypes['ddl']
-            : $this->sqlKeywordsToClasses($keywords);
+        $classes = $this->sqlKeywordsToClasses($keywords);
 
         return $this->sqlHasStatements($classes, true);
     }
 
     /**
-     * @param string[]|null $keywords
+     * @param string[] $keywords Clause types (eg; SELECT, UPDATE...)
      *
      * @return FileList
      */
-    public function sqlWithoutDDL($keywords = null)
+    public function sqlWithout($keywords)
     {
-        $classes = is_null($keywords)
-            ? static::$statementTypes['ddl']
-            : $this->sqlKeywordsToClasses($keywords);
-
-        return $this->sqlHasStatements($classes, false);
-    }
-
-    /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
-     */
-    public function sqlWithDML($keywords = null)
-    {
-        $classes = is_null($keywords)
-            ? static::$statementTypes['dml']
-            : $this->sqlKeywordsToClasses($keywords);
-
-        return $this->sqlHasStatements($classes, true);
-    }
-
-    /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
-     */
-    public function sqlWithoutDML($keywords = null)
-    {
-        $classes = is_null($keywords)
-            ? static::$statementTypes['dml']
-            : $this->sqlKeywordsToClasses($keywords);
-
-        return $this->sqlHasStatements($classes, false);
-    }
-
-    /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
-     */
-    public function sqlWithTCL($keywords = null)
-    {
-        $classes = is_null($keywords)
-            ? static::$statementTypes['tcl']
-            : $this->sqlKeywordsToClasses($keywords);
-
-        return $this->sqlHasStatements($classes, true);
-    }
-
-    /**
-     * @param string[]|null $keywords
-     *
-     * @return FileList
-     */
-    public function sqlWithoutTCL($keywords = null)
-    {
-        $classes = is_null($keywords)
-            ? static::$statementTypes['tcl']
-            : $this->sqlKeywordsToClasses($keywords);
+        $classes = $this->sqlKeywordsToClasses($keywords);
 
         return $this->sqlHasStatements($classes, false);
     }

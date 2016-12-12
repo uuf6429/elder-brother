@@ -27,6 +27,11 @@ class FileListTest extends BaseProjectTest
             }
             file_put_contents($filename, $content);
         }
+
+        // fake old file time
+        touch('LICENSE', strtotime('-2 months'));
+        touch('CONTRIBUTE', strtotime('-4 weeks'));
+        touch('README', strtotime('-2 weeks'));
     }
 
     /**
@@ -222,6 +227,37 @@ class FileListTest extends BaseProjectTest
                 ],
                 '$itemsProvider' => function () {
                     return FullChangeSet::get()->depth('> 1')->toArray();
+                },
+            ],
+
+            // test for file time
+            'files older than a week' => [
+                '$expectedItems' => [
+                    'CONTRIBUTE',
+                    'LICENSE',
+                    'README',
+                ],
+                '$itemsProvider' => function () {
+                    return FullChangeSet::get()->date('before 1 week ago')->toArray();
+                },
+            ],
+            'files older than a month' => [
+                '$expectedItems' => [
+                    'LICENSE',
+                ],
+                '$itemsProvider' => function () {
+                    return FullChangeSet::get()->date('before 1 month ago')->toArray();
+                },
+            ],
+            'files older than 3 weeks but newer than 1 month' => [
+                '$expectedItems' => [
+                    'CONTRIBUTE',
+                ],
+                '$itemsProvider' => function () {
+                    return FullChangeSet::get()
+                        ->date('before 3 weeks ago')
+                        ->date('after 1 month ago')
+                        ->toArray();
                 },
             ],
         ];

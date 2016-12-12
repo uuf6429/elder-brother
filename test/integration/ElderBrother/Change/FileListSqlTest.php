@@ -176,6 +176,14 @@ SQL
                     return FullChangeSet::get()->sqlWithTCL()->toArray();
                 },
             ],
+            'sql with UPDATE' => [
+                '$expectedItems' => [
+                    'sql/EB-002-keys-and-fix.sql',
+                ],
+                '$itemsProvider' => function () {
+                    return FullChangeSet::get()->sqlWith(['UPDATE'])->toArray();
+                },
+            ],
         ];
     }
 }
